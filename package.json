@@ -1,0 +1,27 @@
+{
+  "name": "fvolcheknet",
+  "version": "1.0.0",
+  "description": "fvolchek.net server",
+  "main": "1.js",
+  "dependencies": {
+    "express": "^4.13.4",
+    "mssql": "^3.1.2",
+    "mysql": "^2.10.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.9.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yahooserg/fv.git"
+  },
+  "author": "Sergei Ovcharov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yahooserg/fv/issues"
+  },
+  "homepage": "https://github.com/yahooserg/fv#readme"
+}

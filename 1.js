@@ -100,7 +100,7 @@
         var connection = new sql.Connection(mssqlConnection, function (err) {
 
             var request = new sql.Request(connection),
-                query = "select c.Cash_Code as Store, c2.chequeID, c.Ck_Number as Ch,c.Summa as Total, c.Disc_Sum as discount, g.Code as code, g.goodsName as gName, c2.Quant as qty, c2.Price as price, c2.Summa as Sum, convert(date,c.DateOperation) as date,convert(char(8),c.DateOperation,108)as time from Goods4 as g,ChequeHead as c,ChequePos as c2 where g.Code=c2.Code and c2.ChequeId=c.Id and convert(date,c.DateOperation) = '" + req.params.date + "' and c.Cash_Code = " + req.params.id + " order by c2.ChequeId desc"
+                query = "select c.Cash_Code as Store, c2.chequeID, c.Ck_Number as Ch,c.Summa as Total, c.Disc_Sum as discount, g.Code as code, g.goodsName as gName, c2.Quant as qty, c2.Price as price, c2.Summa as Sum, convert(date,c.DateOperation) as date,convert(char(8),c.DateOperation,108)as time from Goods4 as g,ChequeHead as c,ChequePos as c2 where g.Code=c2.Code and c2.ChequeId=c.Id and convert(date,c.DateOperation) = '" + req.params.date + "' and c.Cash_Code = " + req.params.id + " order by c2.ChequeId desc";
 
             request.query(query, function (err, recordset) {
                 // console.info(recordset);
@@ -133,6 +133,38 @@
                 res.header("Content-Type", "application/json");
                 res.send(JSON.stringify(resultArray));
                 // res.send(JSON.stringify(recordset));
+            });
+        });
+    });
+
+    app.get('/api/hourlystats/store/:id/date/:date/datefrom/:datefrom', function (req, res) {
+
+        var connection = new sql.Connection(mssqlConnection, function (err) {
+
+            var request = new sql.Request(connection),
+                query = "select sum(c.Summa) as total, count(c.Summa) as checks, convert(date,c.DateOperation) as date,DATEPART(hh,c.DateOperation)as time from ChequeHead as c where convert(date,c.DateOperation) <= '" + req.params.date + "' and convert(date,c.DateOperation) >= '" + req.params.datefrom + "' and c.Cash_Code = " + req.params.id + " group by convert(date,c.DateOperation), DATEPART(hh,c.DateOperation) order by DATEPART(hh,c.DateOperation), convert(date,c.DateOperation)";
+
+            request.query(query, function (err, recordset) {
+                var result = {}, i = 0, sumByTime = {};
+                for (i; i < recordset.length; i += 1) {
+                    var date = recordset[i].date.getFullYear() + '-' + (recordset[i].date.getMonth() + 1) + '-' + recordset[i].date.getDate();;
+                    if(!result[recordset[i].time]) {
+                        result[recordset[i].time] = {};
+                    }
+                    if(!result[recordset[i].time][date]) {
+                        result[recordset[i].time][date] = {};
+                    }
+                    result[recordset[i].time][date].cash = recordset[i].total;
+                    result[recordset[i].time][date].checks = recordset[i].checks;
+                    result[recordset[i].time].time = recordset[i].time;
+                    if(!sumByTime[date]) {
+                        sumByTime[date] = 0;
+                    }
+                    sumByTime[date] = sumByTime[date] + recordset[i].total;
+                    result[recordset[i].time][date].sum = sumByTime[date];
+                }
+                res.header("Content-Type", "application/json");
+                res.send(JSON.stringify(result));
             });
         });
     });

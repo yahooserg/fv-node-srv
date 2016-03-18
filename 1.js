@@ -145,7 +145,10 @@
                 query = "select sum(c.Summa) as total, count(c.Summa) as checks, convert(date,c.DateOperation) as date,DATEPART(hh,c.DateOperation)as time from ChequeHead as c where convert(date,c.DateOperation) <= '" + req.params.date + "' and convert(date,c.DateOperation) >= '" + req.params.datefrom + "' and c.Cash_Code = " + req.params.id + " group by convert(date,c.DateOperation), DATEPART(hh,c.DateOperation) order by DATEPART(hh,c.DateOperation), convert(date,c.DateOperation)";
 
             request.query(query, function (err, recordset) {
-                var result = {}, i = 0, sumByTime = {};
+                var result = {},
+                    i = 0,
+                    sumByTime = {},
+                    checksByTime = {};
                 for (i; i < recordset.length; i += 1) {
                     var date = recordset[i].date.getFullYear() + '-' + (recordset[i].date.getMonth() + 1) + '-' + recordset[i].date.getDate();;
                     if(!result[recordset[i].time]) {
@@ -160,8 +163,13 @@
                     if(!sumByTime[date]) {
                         sumByTime[date] = 0;
                     }
+                    if(!checksByTime[date]) {
+                        checksByTime[date] = 0;
+                    }
                     sumByTime[date] = sumByTime[date] + recordset[i].total;
+                    checksByTime[date] = checksByTime[date] + recordset[i].checks;
                     result[recordset[i].time][date].sum = sumByTime[date];
+                    result[recordset[i].time][date].checksByTime = checksByTime[date];
                 }
                 res.header("Content-Type", "application/json");
                 res.send(JSON.stringify(result));

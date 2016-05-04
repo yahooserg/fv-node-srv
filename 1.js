@@ -1,7 +1,6 @@
 (function () {
     "use strict";
     var fs = require('fs'),
-        // http = require('http'),
         https = require('https'),
         express = require('express'),
         mysql = require('mysql'),
@@ -12,14 +11,23 @@
         privateKey,
         certificate,
         credentials,
-        // httpServer,
         httpsServer;
     app = express();
-    privateKey = fs.readFileSync(__dirname + '/../ssl.key');
-    certificate = fs.readFileSync(__dirname + '/../ssl.crt');
-    credentials = {key: privateKey, cert: certificate};
-    // httpServer = http.createServer(app);
-    httpsServer = https.createServer(credentials, app);
+
+
+    //UNCOMMENT FOR production
+    //
+    // privateKey = fs.readFileSync(__dirname + '/../ssl.key');
+    // certificate = fs.readFileSync(__dirname + '/../ssl.crt');
+    // credentials = {key: privateKey, cert: certificate};
+    // httpsServer = https.createServer(credentials, app);
+
+    //COMMENT FOR production
+    //
+    var http = require('http');
+    var httpServer,
+    httpServer = http.createServer(app);
+
     //after serve all app via node (no apache or php) you have to add http and redirection to https with something like following:
     // var redirectApp = express () ,
     // redirectServer = http.createServer(redirectApp);
@@ -177,7 +185,16 @@
         });
     });
 
-    httpsServer.listen(5555, function () {
+
+        app.get('/api/orders/store/:id/date/:date', function (req, res) {
+            console.log("HURRAY");
+        });
+
+    // httpsServer.listen(5555, function () {
+    //     var date = new Date();
+    //     console.log('fv server runs at 5555 ' + __dirname + ' ' + date);
+    // });
+    httpServer.listen(5555, function () {
         var date = new Date();
         console.log('fv server runs at 5555 ' + __dirname + ' ' + date);
     });

@@ -1,17 +1,20 @@
+/*jslint nomen: true, node: true, unparam: true*/
 (function () {
     "use strict";
-    var fs = require('fs'),
-        https = require('https'),
-        express = require('express'),
+    var express = require('express'),
         mysql = require('mysql'),
         sql = require('mssql'),
         mysqlConnection = require(__dirname + '/../dbconnectmysqlnode.js'),
         mssqlConnection = require(__dirname + '/../dbconnectmssqlnode.js'),
         app,
-        privateKey,
-        certificate,
-        credentials,
-        httpsServer;
+        // https = require('https'),
+        // fs = require('fs'),
+        // privateKey,
+        // certificate,
+        // credentials,
+        // httpsServer;
+        http,
+        httpServer;
     app = express();
 
 
@@ -24,8 +27,7 @@
 
     //COMMENT FOR production
     //
-    var http = require('http');
-    var httpServer,
+    http = require('http');
     httpServer = http.createServer(app);
 
     //after serve all app via node (no apache or php) you have to add http and redirection to https with something like following:
@@ -48,30 +50,6 @@
         res.header("Access-Control-Allow-Origin", "*");
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
         next();
-    });
-
-    app.get('/test', function (req, res) {
-        console.log('test');
-        var user = {};
-        user.firstName = 'serg';
-        user.lastName = 'ovcharov';
-        res.header("Content-Type", "application/json");
-        res.send(JSON.stringify(user));
-        // var connection = mysql.createConnection(mysqlConnection);
-        //
-        // connection.connect();
-        //
-        // connection.query('SELECT firstName, lastName from users where id = 1', function (err, rows, fields) {
-        //     if (err) {
-        //         throw err;
-        //     }
-        //     user.firstName = rows[0].firstName;
-        //     user.lastName = rows[0].lastName;
-        //     res.header("Content-Type", "application/json");
-        //     res.send(JSON.stringify(user));
-        // });
-        //
-        // connection.end();
     });
 
     app.get('/api/storedata/store/:id/date/:date', function (req, res) {
@@ -113,18 +91,18 @@
             request.query(query, function (err, recordset) {
                 // console.info(recordset);
                 var result = {}, i = 0, resultArray = [];
-                for (i; i < recordset.length; i += 1) {
-                    if(!result[recordset[i].Ch]) {
+                for (i = 0; i < recordset.length; i += 1) {
+                    if (!result[recordset[i].Ch]) {
                         result[recordset[i].Ch] = {};
                         // console.log(typeof 'recordset.Ch');
                     }
-                    if(!result[recordset[i].Ch].number){
+                    if (!result[recordset[i].Ch].number) {
                         result[recordset[i].Ch].number = recordset[i].Ch;
                         result[recordset[i].Ch].total = recordset[i].Total;
                         result[recordset[i].Ch].discount = recordset[i].discount;
                         result[recordset[i].Ch].time = recordset[i].time;
                     }
-                    if(!result[recordset[i].Ch].goods) {
+                    if (!result[recordset[i].Ch].goods) {
                         result[recordset[i].Ch].goods = [];
                     }
                     result[recordset[i].Ch].goods[result[recordset[i].Ch].goods.length] = {};
@@ -135,7 +113,7 @@
                     result[recordset[i].Ch].goods[result[recordset[i].Ch].goods.length - 1].sum = recordset[i].Sum;
                 }
                 //loop through all properties and make a result array
-                for(i in result){
+                for (i in result) {
                     resultArray[resultArray.length] = result[i];
                 }
                 res.header("Content-Type", "application/json");
@@ -156,22 +134,23 @@
                 var result = {},
                     i = 0,
                     sumByTime = {},
-                    checksByTime = {};
+                    checksByTime = {},
+                    date;
                 for (i; i < recordset.length; i += 1) {
-                    var date = recordset[i].date.getFullYear() + '-' + (recordset[i].date.getMonth() + 1) + '-' + recordset[i].date.getDate();;
-                    if(!result[recordset[i].time]) {
+                    date = recordset[i].date.getFullYear() + '-' + (recordset[i].date.getMonth() + 1) + '-' + recordset[i].date.getDate();
+                    if (!result[recordset[i].time]) {
                         result[recordset[i].time] = {};
                     }
-                    if(!result[recordset[i].time][date]) {
+                    if (!result[recordset[i].time][date]) {
                         result[recordset[i].time][date] = {};
                     }
                     result[recordset[i].time][date].cash = recordset[i].total;
                     result[recordset[i].time][date].checks = recordset[i].checks;
                     result[recordset[i].time].time = recordset[i].time;
-                    if(!sumByTime[date]) {
+                    if (!sumByTime[date]) {
                         sumByTime[date] = 0;
                     }
-                    if(!checksByTime[date]) {
+                    if (!checksByTime[date]) {
                         checksByTime[date] = 0;
                     }
                     sumByTime[date] = sumByTime[date] + recordset[i].total;
@@ -186,9 +165,42 @@
     });
 
 
-        app.get('/api/orders/store/:id/date/:date', function (req, res) {
-            console.log("HURRAY");
+    app.get('/api/orders/store/:id/date/:date', function (req, res) {
+        var dateToOrder = req.params.date,
+            dateArray = dateToOrder.split('-'),
+            dateWeekAgo = new Date(dateArray[0] + '-' + dateArray[1] + '-' + dateArray[2]),
+            dateTwoWeeksAgo = new Date(dateArray[0] + '-' + dateArray[1] + '-' + dateArray[2]);
+        dateWeekAgo.setDate(dateWeekAgo.getDate() - 7);
+        dateTwoWeeksAgo.setDate(dateTwoWeeksAgo.getDate() - 14);
+
+        dateWeekAgo = dateWeekAgo.getFullYear() + '-' + (dateWeekAgo.getMonth() + 1) + '-' + dateWeekAgo.getDate();
+        dateTwoWeeksAgo = dateTwoWeeksAgo.getFullYear() + '-' + (dateTwoWeeksAgo.getMonth() + 1) + '-' + dateTwoWeeksAgo.getDate();
+
+        var connection = new sql.Connection(mssqlConnection, function (err) {
+
+            var request = new sql.Request(connection),
+                            query = "select sum(c.Summa) as total, count(c.Summa) as checks, convert(date,c.DateOperation) as date,DATEPART(hh,c.DateOperation)as time from ChequeHead as c where convert(date,c.DateOperation) = '" + req.params.date + "' and c.Cash_Code = " + req.params.id + " group by convert(date,c.DateOperation), DATEPART(hh,c.DateOperation) order by DATEPART(hh,c.DateOperation), convert(date,c.DateOperation)";
+
+            request.query(query, function (err, recordset) {
+                var result = {},
+                    i = 0,
+                    sumByTime = {},
+                    checksByTime = {},
+                    date;
+                for (i; i < recordset.length; i += 1) {
+
+                }
+                res.header("Content-Type", "application/json");
+                res.send(JSON.stringify(recordset));
+            });
         });
+
+        console.log(dateWeekAgo);
+        console.log(dateTwoWeeksAgo);
+
+
+        // res.send(JSON.stringify(req.params.date));
+    });
 
     // httpsServer.listen(5555, function () {
     //     var date = new Date();

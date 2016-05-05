@@ -202,19 +202,14 @@
         connection = new sql.Connection(mssqlConnection, function (err) {
 
             var request = new sql.Request(connection),
-            // this is query for losses 1 week ago
-            //
-            //query = "select sales.gName as good, sum(sales.qty) as qty, code from (select c.Cash_Code as Store, c.Summa as Total, c.Disc_Sum as discount, g.Code as code, g.goodsName as gName, c2.Quant as qty, c2.Price as price, c2.Summa as Sum from Goods4 as g,ChequeHead as c,ChequePos as c2 where g.Code=c2.Code and c2.ChequeId=c.Id and c.DateOperation between '" + dateWeekAgo + " 12:00' and '" + dateWeekAgoPlusDay + " 12:00' and c.Cash_Code = " + req.params.id + " and price = 0) as sales group by sales.gName";
 
-            query = "select sales.gName as good, sum(sales.qty) as qty, convert(date, dates), code from (select c.DateOperation as dates, c.Cash_Code as Store, c.Summa as Total, c.Disc_Sum as discount, g.Code as code, g.goodsName as gName, c2.Quant as qty, c2.Price as price, c2.Summa as Sum from Goods4 as g,ChequeHead as c,ChequePos as c2 where g.Code=c2.Code and c2.ChequeId=c.Id and (convert(date,c.DateOperation) = '" + dateWeekAgo + "' or convert(date,c.DateOperation) = '" + dateTwoWeeksAgo + "') and c.Cash_Code = " + req.params.id + " and price > 0) as sales group by convert(date, dates), sales.gName, code";
+                query = "select sales.gName as good, sum(sales.qty) as qty, convert(date, dates) as date, code from (select c.DateOperation as dates, c.Cash_Code as Store, c.Summa as Total, c.Disc_Sum as discount, g.Code as code, g.goodsName as gName, c2.Quant as qty, c2.Price as price, c2.Summa as Sum from Goods4 as g,ChequeHead as c,ChequePos as c2 where g.Code=c2.Code and c2.ChequeId=c.Id and (convert(date,c.DateOperation) = '" + dateWeekAgo + "' or convert(date,c.DateOperation) = '" + dateTwoWeeksAgo + "') and c.Cash_Code = " + req.params.id + " and price > 0) as sales group by convert(date, dates), sales.gName, code";
 
             request.query(query, function (err, recordset) {
                 var result = [],
-                    i = 0,
-                    sumByTime = {},
-                    checksByTime = {},
-                    date,
-                    index;
+                    i,
+                    index,
+                    connectionTwo;
                 for (i = 0; i < recordset.length; i += 1) {
                     index = result.length;
                     result[index] = {
@@ -226,16 +221,97 @@
                         result[index].qtyTwo = recordset[i].qty;
                         i += 1;
                     } else {
-                        result[index].qtyTwo = result[index].qty;
+                        if (getDateString(recordset[i].date) === dateWeekAgo) {
+                            result[index].qtyOne = recordset[i].qty;
+                            result[index].qtyTwo = 0;
+
+                        } else {
+                            result[index].qtyTwo = recordset[i].qty;
+                            result[index].qtyOne = 0;
+                        }
                     }
                 }
-                res.header("Content-Type", "application/json");
-                res.send(JSON.stringify(recordset));
+                connectionTwo = new sql.Connection(mssqlConnection, function (err) {
+
+                    var request = new sql.Request(connectionTwo),
+                    // this is query for losses 1 week ago
+                    //
+                    query = "select sales.gName as good, sum(sales.qty) as qty, code from (select c.Cash_Code as Store, c.Summa as Total, c.Disc_Sum as discount, g.Code as code, g.goodsName as gName, c2.Quant as qty, c2.Price as price, c2.Summa as Sum from Goods4 as g,ChequeHead as c,ChequePos as c2 where g.Code=c2.Code and c2.ChequeId=c.Id and c.DateOperation between '" + dateWeekAgo + " 12:00' and '" + dateWeekAgoPlusDay + " 12:00' and c.Cash_Code = " + req.params.id + " and price = 0) as sales group by sales.gName, code";
+
+
+                    request.query(query, function (err, recordset) {
+                        var i,
+                            j,
+                            index,
+                            connectionThree;
+                        for (i = 0; i < result.length; i += 1) {
+                            result[i].lossOne = 0;
+                            for(j = 0; j < recordset.length; j += 1) {
+                                if(result[i].code === recordset[j].code) {
+                                    result[i].lossOne = recordset[j].qty;
+                                    recordset.splice(j,1);
+                                    break;
+                                }
+                            }
+                        }
+                        if (recordset.length) {
+                            for(j = 0; j < recordset.length; j += 1) {
+                                index = result.length;
+                                result[index] = {
+                                    good: recordset[i].good,
+                                    code: recordset[i].code,
+                                    qtyOne: 0,
+                                    qtyTwo: 0,
+                                    lossOne: recordset[j].qty
+                                };
+                            }
+                        }
+                        connectionThree = new sql.Connection(mssqlConnection, function (err) {
+
+                            var request = new sql.Request(connectionThree),
+                            // this is query for losses 1 week ago
+                            //
+                            query = "select sales.gName as good, sum(sales.qty) as qty, code from (select c.Cash_Code as Store, c.Summa as Total, c.Disc_Sum as discount, g.Code as code, g.goodsName as gName, c2.Quant as qty, c2.Price as price, c2.Summa as Sum from Goods4 as g,ChequeHead as c,ChequePos as c2 where g.Code=c2.Code and c2.ChequeId=c.Id and c.DateOperation between '" + dateTwoWeeksAgo + " 12:00' and '" + dateTwoWeeksAgoPlusDay + " 12:00' and c.Cash_Code = " + req.params.id + " and price = 0) as sales group by sales.gName, code";
+
+
+                            request.query(query, function (err, recordset) {
+                                var i,
+                                    j,
+                                    index;
+                                for (i = 0; i < result.length; i += 1) {
+                                    result[i].lossTwo = 0;
+                                    for(j = 0; j < recordset.length; j += 1) {
+                                        if(result[i].code === recordset[j].code) {
+                                            result[i].lossTwo = recordset[j].qty;
+                                            recordset.splice(j,1);
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (recordset.length) {
+                                    for(j = 0; j < recordset.length; j += 1) {
+                                        index = result.length;
+                                        result[index] = {
+                                            good: recordset[i].good,
+                                            code: recordset[i].code,
+                                            qtyOne: 0,
+                                            qtyTwo: 0,
+                                            lossTwo: recordset[j].qty,
+                                            lossOne: 0
+                                        };
+                                    }
+                                }
+                                res.header("Content-Type", "application/json");
+                                res.send(JSON.stringify(result));
+                            });
+                        });
+                    });
+                });
             });
         });
 
-        console.log(dateWeekAgo);
-        console.log(dateWeekAgoPlusDay);
+        // console.log(dateWeekAgo);
+        // console.log(dateWeekAgoPlusDay);
         console.log(dateTwoWeeksAgo);
         console.log(dateTwoWeeksAgoPlusDay);
 

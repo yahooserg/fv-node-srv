@@ -166,29 +166,68 @@
 
 
     app.get('/api/orders/store/:id/date/:date', function (req, res) {
-        var dateToOrder = req.params.date,
+        var connection,
+            dateToOrder = req.params.date,
             dateArray = dateToOrder.split('-'),
             dateWeekAgo = new Date(dateArray[0] + '-' + dateArray[1] + '-' + dateArray[2]),
-            dateTwoWeeksAgo = new Date(dateArray[0] + '-' + dateArray[1] + '-' + dateArray[2]);
+            dateTwoWeeksAgo = new Date(dateArray[0] + '-' + dateArray[1] + '-' + dateArray[2]),
+            dateWeekAgoPlusDay = new Date(dateArray[0] + '-' + dateArray[1] + '-' + dateArray[2]),
+            dateTwoWeeksAgoPlusDay = new Date(dateArray[0] + '-' + dateArray[1] + '-' + dateArray[2]),
+            getDateString;
+
+        getDateString = function (date) {
+            var day = date.getDate(),
+                month = date.getMonth() + 1;
+            if (day < 10) {
+                day = '0' + day;
+            }
+            if (month < 10) {
+                month = '0' + month;
+            }
+            return date.getFullYear() + '-' + month + '-' + day;
+        };
+
         dateWeekAgo.setDate(dateWeekAgo.getDate() - 7);
         dateTwoWeeksAgo.setDate(dateTwoWeeksAgo.getDate() - 14);
+        dateWeekAgoPlusDay.setDate(dateWeekAgoPlusDay.getDate() - 6);
+        dateTwoWeeksAgoPlusDay.setDate(dateTwoWeeksAgoPlusDay.getDate() - 13);
 
-        dateWeekAgo = dateWeekAgo.getFullYear() + '-' + (dateWeekAgo.getMonth() + 1) + '-' + dateWeekAgo.getDate();
-        dateTwoWeeksAgo = dateTwoWeeksAgo.getFullYear() + '-' + (dateTwoWeeksAgo.getMonth() + 1) + '-' + dateTwoWeeksAgo.getDate();
 
-        var connection = new sql.Connection(mssqlConnection, function (err) {
+        dateWeekAgo = getDateString(dateWeekAgo);
+        dateTwoWeeksAgo = getDateString(dateTwoWeeksAgo);
+        dateWeekAgoPlusDay = getDateString(dateWeekAgoPlusDay);
+        dateTwoWeeksAgoPlusDay = getDateString(dateTwoWeeksAgoPlusDay);
+
+
+        connection = new sql.Connection(mssqlConnection, function (err) {
 
             var request = new sql.Request(connection),
-                            query = "select sum(c.Summa) as total, count(c.Summa) as checks, convert(date,c.DateOperation) as date,DATEPART(hh,c.DateOperation)as time from ChequeHead as c where convert(date,c.DateOperation) = '" + req.params.date + "' and c.Cash_Code = " + req.params.id + " group by convert(date,c.DateOperation), DATEPART(hh,c.DateOperation) order by DATEPART(hh,c.DateOperation), convert(date,c.DateOperation)";
+            // this is query for losses 1 week ago
+            //
+            //query = "select sales.gName as good, sum(sales.qty) as qty, code from (select c.Cash_Code as Store, c.Summa as Total, c.Disc_Sum as discount, g.Code as code, g.goodsName as gName, c2.Quant as qty, c2.Price as price, c2.Summa as Sum from Goods4 as g,ChequeHead as c,ChequePos as c2 where g.Code=c2.Code and c2.ChequeId=c.Id and c.DateOperation between '" + dateWeekAgo + " 12:00' and '" + dateWeekAgoPlusDay + " 12:00' and c.Cash_Code = " + req.params.id + " and price = 0) as sales group by sales.gName";
+
+            query = "select sales.gName as good, sum(sales.qty) as qty, convert(date, dates), code from (select c.DateOperation as dates, c.Cash_Code as Store, c.Summa as Total, c.Disc_Sum as discount, g.Code as code, g.goodsName as gName, c2.Quant as qty, c2.Price as price, c2.Summa as Sum from Goods4 as g,ChequeHead as c,ChequePos as c2 where g.Code=c2.Code and c2.ChequeId=c.Id and (convert(date,c.DateOperation) = '" + dateWeekAgo + "' or convert(date,c.DateOperation) = '" + dateTwoWeeksAgo + "') and c.Cash_Code = " + req.params.id + " and price > 0) as sales group by convert(date, dates), sales.gName, code";
 
             request.query(query, function (err, recordset) {
-                var result = {},
+                var result = [],
                     i = 0,
                     sumByTime = {},
                     checksByTime = {},
-                    date;
-                for (i; i < recordset.length; i += 1) {
-
+                    date,
+                    index;
+                for (i = 0; i < recordset.length; i += 1) {
+                    index = result.length;
+                    result[index] = {
+                        good: recordset[i].good,
+                        code: recordset[i].code,
+                    };
+                    if (recordset[i].code === recordset[i + 1].code) {
+                        result[index].qtyOne = recordset[i + 1].qty;
+                        result[index].qtyTwo = recordset[i].qty;
+                        i += 1;
+                    } else {
+                        result[index].qtyTwo = result[index].qty;
+                    }
                 }
                 res.header("Content-Type", "application/json");
                 res.send(JSON.stringify(recordset));
@@ -196,7 +235,9 @@
         });
 
         console.log(dateWeekAgo);
+        console.log(dateWeekAgoPlusDay);
         console.log(dateTwoWeeksAgo);
+        console.log(dateTwoWeeksAgoPlusDay);
 
 
         // res.send(JSON.stringify(req.params.date));

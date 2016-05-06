@@ -6,8 +6,9 @@
         sql = require('mssql'),
         mysqlConnection = require(__dirname + '/../dbconnectmysqlnode.js'),
         mssqlConnection = require(__dirname + '/../dbconnectmssqlnode.js'),
+        weatherKey = require(__dirname + '/../weatherkey'),
         app,
-        // https = require('https'),
+        https = require('https'),
         // fs = require('fs'),
         // privateKey,
         // certificate,
@@ -15,8 +16,8 @@
         // httpsServer;
         http,
         httpServer;
-    app = express();
 
+    app = express();
 
     //UNCOMMENT FOR production
     //
@@ -383,6 +384,16 @@
 
 
         // res.send(JSON.stringify(req.params.date));
+    });
+
+    app.get('/api/weather/', function (req, res) {
+        var url = 'https://api.forecast.io/forecast/' + weatherKey + '/59.934280,30.335099/?units=si&lang=ru&exclude=minutely,currently,hourly'
+        https.get(url, function (resp) {
+            resp.on('data', (d) => {
+                res.header("Content-Type", "application/json");
+                res.send(d);
+            });
+        });
     });
 
     // httpsServer.listen(5555, function () {

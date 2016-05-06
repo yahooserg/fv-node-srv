@@ -202,14 +202,19 @@
         connection = new sql.Connection(mssqlConnection, function (err) {
 
             var request = new sql.Request(connection),
-
+                //this query for all sales 1 and 2 weeks ago
+                //
                 query = "select sales.gName as good, sum(sales.qty) as qty, convert(date, dates) as date, code from (select c.DateOperation as dates, c.Cash_Code as Store, c.Summa as Total, c.Disc_Sum as discount, g.Code as code, g.goodsName as gName, c2.Quant as qty, c2.Price as price, c2.Summa as Sum from Goods4 as g,ChequeHead as c,ChequePos as c2 where g.Code=c2.Code and c2.ChequeId=c.Id and (convert(date,c.DateOperation) = '" + dateWeekAgo + "' or convert(date,c.DateOperation) = '" + dateTwoWeeksAgo + "') and c.Cash_Code = " + req.params.id + " and price > 0) as sales group by convert(date, dates), sales.gName, code";
 
             request.query(query, function (err, recordset) {
+
                 var result = [],
                     i,
                     index,
                     connectionTwo;
+                // now iterating over the recordset got from query we will fill
+                // result for each item (good)
+                //
                 for (i = 0; i < recordset.length; i += 1) {
                     index = result.length;
                     result[index] = {
@@ -231,9 +236,9 @@
                         }
                     }
                 }
-                connectionTwo = new sql.Connection(mssqlConnection, function (err) {
+                connection = new sql.Connection(mssqlConnection, function (err) {
 
-                    var request = new sql.Request(connectionTwo),
+                    request = new sql.Request(connection);
                     // this is query for losses 1 week ago
                     //
                     query = "select sales.gName as good, sum(sales.qty) as qty, code from (select c.Cash_Code as Store, c.Summa as Total, c.Disc_Sum as discount, g.Code as code, g.goodsName as gName, c2.Quant as qty, c2.Price as price, c2.Summa as Sum from Goods4 as g,ChequeHead as c,ChequePos as c2 where g.Code=c2.Code and c2.ChequeId=c.Id and c.DateOperation between '" + dateWeekAgo + " 12:00' and '" + dateWeekAgoPlusDay + " 12:00' and c.Cash_Code = " + req.params.id + " and price = 0) as sales group by sales.gName, code";
@@ -254,6 +259,10 @@
                                 }
                             }
                         }
+
+                        //if still losses left means all was in loss and no sales of the item.
+                        //so let's add it to result
+                        //
                         if (recordset.length) {
                             for(j = 0; j < recordset.length; j += 1) {
                                 index = result.length;
@@ -266,9 +275,9 @@
                                 };
                             }
                         }
-                        connectionThree = new sql.Connection(mssqlConnection, function (err) {
+                        connection = new sql.Connection(mssqlConnection, function (err) {
 
-                            var request = new sql.Request(connectionThree),
+                            request = new sql.Request(connection);
                             // this is query for losses 1 week ago
                             //
                             query = "select sales.gName as good, sum(sales.qty) as qty, code from (select c.Cash_Code as Store, c.Summa as Total, c.Disc_Sum as discount, g.Code as code, g.goodsName as gName, c2.Quant as qty, c2.Price as price, c2.Summa as Sum from Goods4 as g,ChequeHead as c,ChequePos as c2 where g.Code=c2.Code and c2.ChequeId=c.Id and c.DateOperation between '" + dateTwoWeeksAgo + " 12:00' and '" + dateTwoWeeksAgoPlusDay + " 12:00' and c.Cash_Code = " + req.params.id + " and price = 0) as sales group by sales.gName, code";
@@ -288,6 +297,10 @@
                                         }
                                     }
                                 }
+
+                                //if still losses left means all was in loss and no sales of the item.
+                                //so let's add it to result
+                                //
                                 if (recordset.length) {
                                     for(j = 0; j < recordset.length; j += 1) {
                                         index = result.length;
@@ -301,8 +314,45 @@
                                         };
                                     }
                                 }
-                                res.header("Content-Type", "application/json");
-                                res.send(JSON.stringify(result));
+
+                                //new connection to get last time of good was sold
+                                //
+                                connection = new sql.Connection(mssqlConnection, function (err) {
+
+                                    request = new sql.Request(connection);
+
+                                    // this query gets times of last sale for each item 1 and 2 weeks ago
+                                    //
+                                    query = "select sales.gName as good, max(dates) as timeOfLastSale, code from (select c.DateOperation as dates, c.Cash_Code as Store, c.Summa as Total, c.Disc_Sum as discount, g.Code as code, g.goodsName as gName, c2.Quant as qty, c2.Price as price, c2.Summa as Sum from Goods4 as g,ChequeHead as c,ChequePos as c2 where g.Code=c2.Code and c2.ChequeId=c.Id and (convert(date,c.DateOperation) = '" + dateWeekAgo + "' or convert(date,c.DateOperation) = '" + dateTwoWeeksAgo + "') and c.Cash_Code = " + req.params.id + " and price > 0) as sales group by convert(date, dates), sales.gName, code";
+
+
+                                    request.query(query, function (err, recordset) {
+                                        var i,
+                                            j,
+                                            index;
+                                        for (i = 0; i < result.length; i += 1) {
+                                            for(j = 0; j < recordset.length; j += 1) {
+                                                if(result[i].code === recordset[j].code) {
+                                                    if (getDateString(recordset[j].timeOfLastSale) === dateWeekAgo) {
+                                                        result[i].lastSaleWeekAgo = recordset[j].timeOfLastSale;
+                                                        recordset.splice(j,1);
+                                                        break;
+                                                    } else {
+                                                        result[i].lastSaleTwoWeeksAgo = recordset[j].timeOfLastSale;
+                                                        recordset.splice(j,1);
+                                                        if (result[i].code === recordset[j].code) {
+                                                            result[i].lastSaleWeekAgo = recordset[j].timeOfLastSale;
+                                                            recordset.splice(j,1);
+                                                        }
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        res.header("Content-Type", "application/json");
+                                        res.send(JSON.stringify(result));
+                                    });
+                                });
                             });
                         });
                     });
@@ -312,8 +362,8 @@
 
         // console.log(dateWeekAgo);
         // console.log(dateWeekAgoPlusDay);
-        console.log(dateTwoWeeksAgo);
-        console.log(dateTwoWeeksAgoPlusDay);
+        // console.log(dateTwoWeeksAgo);
+        // console.log(dateTwoWeeksAgoPlusDay);
 
 
         // res.send(JSON.stringify(req.params.date));

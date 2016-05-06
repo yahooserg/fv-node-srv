@@ -278,8 +278,8 @@
                             for(j = 0; j < recordset.length; j += 1) {
                                 index = result.length;
                                 result[index] = {
-                                    good: recordset[i].good,
-                                    code: recordset[i].code,
+                                    good: recordset[j].good,
+                                    code: recordset[j].code,
                                     qtyOne: 0,
                                     qtyTwo: 0,
                                     lossOne: recordset[j].qty
@@ -316,8 +316,8 @@
                                     for(j = 0; j < recordset.length; j += 1) {
                                         index = result.length;
                                         result[index] = {
-                                            good: recordset[i].good,
-                                            code: recordset[i].code,
+                                            good: recordset[j].good,
+                                            code: recordset[j].code,
                                             qtyOne: 0,
                                             qtyTwo: 0,
                                             lossTwo: recordset[j].qty,
@@ -342,6 +342,11 @@
                                             j,
                                             index;
                                         for (i = 0; i < result.length; i += 1) {
+                                            result[i].qtyToOrder = Math.ceil(result[i].qtyOne);
+                                            if (result[i].qtyToOrder < 0) {
+                                                result[i].qtyToOrder = 0;
+                                            }
+                                            result[i].qtyRecommended = result[i].qtyToOrder;
                                             for(j = 0; j < recordset.length; j += 1) {
                                                 if(result[i].code === recordset[j].code) {
                                                     if (getDateString(recordset[j].timeOfLastSale) === dateWeekAgo) {

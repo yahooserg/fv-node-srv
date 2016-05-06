@@ -164,6 +164,17 @@
         });
     });
 
+    var getTimeString = function (date) {
+        var hour = date.getUTCHours(),
+            minute = date.getUTCMinutes();
+        if (hour < 10) {
+            hour = '0' + hour;
+        }
+        if (minute < 10) {
+            minute = '0' + minute;
+        }
+        return hour + ':' + minute;
+    };
 
     app.get('/api/orders/store/:id/date/:date', function (req, res) {
         var connection,
@@ -334,14 +345,14 @@
                                             for(j = 0; j < recordset.length; j += 1) {
                                                 if(result[i].code === recordset[j].code) {
                                                     if (getDateString(recordset[j].timeOfLastSale) === dateWeekAgo) {
-                                                        result[i].lastSaleWeekAgo = recordset[j].timeOfLastSale;
+                                                        result[i].lastSaleWeekAgo = getTimeString(recordset[j].timeOfLastSale);
                                                         recordset.splice(j,1);
                                                         break;
                                                     } else {
-                                                        result[i].lastSaleTwoWeeksAgo = recordset[j].timeOfLastSale;
+                                                        result[i].lastSaleTwoWeeksAgo = getTimeString(recordset[j].timeOfLastSale);
                                                         recordset.splice(j,1);
                                                         if (result[i].code === recordset[j].code) {
-                                                            result[i].lastSaleWeekAgo = recordset[j].timeOfLastSale;
+                                                            result[i].lastSaleWeekAgo = getTimeString(recordset[j].timeOfLastSale);
                                                             recordset.splice(j,1);
                                                         }
                                                         break;

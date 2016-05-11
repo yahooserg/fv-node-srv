@@ -177,6 +177,18 @@
         return hour + ':' + minute;
     };
 
+    var getDateString = function (date) {
+        var day = date.getDate(),
+            month = date.getMonth() + 1;
+        if (day < 10) {
+            day = '0' + day;
+        }
+        if (month < 10) {
+            month = '0' + month;
+        }
+        return date.getFullYear() + '-' + month + '-' + day;
+    };
+
     app.get('/api/orders/store/:id/date/:date', function (req, res) {
         var connection,
             dateToOrder = req.params.date,
@@ -184,20 +196,9 @@
             dateWeekAgo = new Date(dateArray[0] + '-' + dateArray[1] + '-' + dateArray[2]),
             dateTwoWeeksAgo = new Date(dateArray[0] + '-' + dateArray[1] + '-' + dateArray[2]),
             dateWeekAgoPlusDay = new Date(dateArray[0] + '-' + dateArray[1] + '-' + dateArray[2]),
-            dateTwoWeeksAgoPlusDay = new Date(dateArray[0] + '-' + dateArray[1] + '-' + dateArray[2]),
-            getDateString;
+            dateTwoWeeksAgoPlusDay = new Date(dateArray[0] + '-' + dateArray[1] + '-' + dateArray[2]);
 
-        getDateString = function (date) {
-            var day = date.getDate(),
-                month = date.getMonth() + 1;
-            if (day < 10) {
-                day = '0' + day;
-            }
-            if (month < 10) {
-                month = '0' + month;
-            }
-            return date.getFullYear() + '-' + month + '-' + day;
-        };
+
 
         dateWeekAgo.setDate(dateWeekAgo.getDate() - 7);
         dateTwoWeeksAgo.setDate(dateTwoWeeksAgo.getDate() - 14);
@@ -386,12 +387,91 @@
         // res.send(JSON.stringify(req.params.date));
     });
 
-    app.get('/api/weather/', function (req, res) {
-        var url = 'https://api.forecast.io/forecast/' + weatherKey + '/59.934280,30.335099/?units=si&lang=ru&exclude=minutely,currently,hourly'
+    app.get('/api/weather/date/:date', function (req, res) {
+
+        function dateDiffInDays(a, b) {
+            var _MS_PER_DAY = 1000 * 60 * 60 * 24;
+            // Discard the time and time-zone information.
+            var utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+            var utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+            // var temp = new Date(utc1);
+            // // console.log(temp);
+            // temp = new Date(utc2);
+            //
+            // // console.log(temp);
+            return Math.floor((utc2 - utc1 + 10000) / _MS_PER_DAY);
+        }
+
+        var url = 'https://api.forecast.io/forecast/' + weatherKey + '/59.934280,30.335099/?units=si&lang=ru&exclude=minutely,currently,hourly',
+            dateReceived = req.params.date,
+            dateToday = new Date(),
+            dateDiff,
+            dateWeekAgo,
+            dateTwoWeeksAgo,
+            urlWeekAgo,
+            urlTwoWeeksAgo;
+            dateReceived = dateReceived.split('-');
+            dateWeekAgo = new Date(dateReceived[0] + '-' + dateReceived[1] + '-' + dateReceived[2]);
+            dateTwoWeeksAgo = new Date(dateReceived[0] + '-' + dateReceived[1] + '-' + dateReceived[2]);
+
+            // 6 and 13 days since iso string will return from msk zone with time 00:00:00 gmt zone wich will be date -1 with time 21:00:00
+            dateWeekAgo.setDate(dateWeekAgo.getDate() - 6);
+            dateTwoWeeksAgo.setDate(dateTwoWeeksAgo.getDate() - 13);
+
+            dateReceived = new Date(dateReceived[0] + '-' + dateReceived[1] + '-' + dateReceived[2]);
+            dateDiff = dateDiffInDays(dateToday, dateReceived);
+            urlWeekAgo = dateWeekAgo.toISOString();
+            urlWeekAgo = urlWeekAgo.slice(0,19);
+            urlWeekAgo = 'https://api.forecast.io/forecast/804d6376a63b076c4efe801a2948b761/59.934280,30.335099,' + urlWeekAgo + '/?units=si&lang=ru&exclude=minutely,currently,hourly';
+            urlTwoWeeksAgo = dateTwoWeeksAgo.toISOString();
+            urlTwoWeeksAgo = urlTwoWeeksAgo.slice(0,19);
+            urlTwoWeeksAgo = 'https://api.forecast.io/forecast/804d6376a63b076c4efe801a2948b761/59.934280,30.335099,' + urlTwoWeeksAgo + '/?units=si&lang=ru&exclude=minutely,currently,hourly';
+
+// https://api.forecast.io/forecast/804d6376a63b076c4efe801a2948b761/59.934280,30.335099,2016-05-07T20:25:00/?units=si&lang=ru&exclude=minutely,currently,hourly
+
+
+            console.log(urlWeekAgo);
+            console.log(urlTwoWeeksAgo);
+
+
         https.get(url, function (resp) {
-            resp.on('data', (d) => {
-                res.header("Content-Type", "application/json");
-                res.send(d);
+            resp.on('data', function (d) {
+                d = JSON.parse(d);
+                var dataToSend = {
+                    dateOfOrder: {
+                        date: new Date(d.daily.data[dateDiff].temperatureMaxTime * 1000),
+                        temperature: Math.round(d.daily.data[dateDiff].temperatureMax),
+                        text: d.daily.data[dateDiff].summary,
+                        humidity:  Math.round(d.daily.data[dateDiff].humidity * 100),
+                        cloudCover: Math.round(d.daily.data[dateDiff].cloudCover * 100)
+                    }
+                };
+                https.get(urlWeekAgo, function (resp) {
+                    resp.on('data', function (d) {
+                        d = JSON.parse(d);
+                        dataToSend.weekAgo = {
+                            date: new Date(d.daily.data[0].temperatureMaxTime * 1000),
+                            temperature: Math.round(d.daily.data[0].temperatureMax),
+                            text: d.daily.data[0].summary,
+                            humidity:  Math.round(d.daily.data[0].humidity * 100),
+                            cloudCover: Math.round(d.daily.data[0].cloudCover * 100)
+                        };
+                        https.get(urlTwoWeeksAgo, function (resp) {
+                            resp.on('data', function (d) {
+                                d = JSON.parse(d);
+                                dataToSend.twoWeeksAgo = {
+                                    date: new Date(d.daily.data[0].temperatureMaxTime * 1000),
+                                    temperature: Math.round(d.daily.data[0].temperatureMax),
+                                    text: d.daily.data[0].summary,
+                                    humidity:  Math.round(d.daily.data[0].humidity * 100),
+                                    cloudCover: Math.round(d.daily.data[0].cloudCover * 100)
+                                };
+                                res.header("Content-Type", "application/json");
+                                res.send(dataToSend);
+                            });
+                        });
+                    });
+                });
             });
         });
     });

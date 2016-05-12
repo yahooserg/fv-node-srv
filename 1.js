@@ -234,7 +234,7 @@
                         good: recordset[i].good,
                         code: recordset[i].code,
                     };
-                    if (recordset[i].code === recordset[i + 1].code) {
+                    if (recordset[i + 1] && recordset[i].code === recordset[i + 1].code) {
                         result[index].qtyOne = recordset[i + 1].qty;
                         result[index].qtyTwo = recordset[i].qty;
                         i += 1;
@@ -358,7 +358,7 @@
                                                     } else {
                                                         result[i].lastSaleTwoWeeksAgo = getTimeString(recordset[j].timeOfLastSale);
                                                         recordset.splice(j,1);
-                                                        if (result[i].code === recordset[j].code) {
+                                                        if (recordset[j] && result[i].code === recordset[j].code) {
                                                             result[i].lastSaleWeekAgo = getTimeString(recordset[j].timeOfLastSale);
                                                             recordset.splice(j,1);
                                                         }
@@ -394,11 +394,6 @@
             // Discard the time and time-zone information.
             var utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
             var utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
-            // var temp = new Date(utc1);
-            // // console.log(temp);
-            // temp = new Date(utc2);
-            //
-            // // console.log(temp);
             return Math.floor((utc2 - utc1 + 10000) / _MS_PER_DAY);
         }
 
@@ -426,12 +421,6 @@
             urlTwoWeeksAgo = dateTwoWeeksAgo.toISOString();
             urlTwoWeeksAgo = urlTwoWeeksAgo.slice(0,19);
             urlTwoWeeksAgo = 'https://api.forecast.io/forecast/804d6376a63b076c4efe801a2948b761/59.934280,30.335099,' + urlTwoWeeksAgo + '/?units=si&lang=ru&exclude=minutely,currently,hourly';
-
-// https://api.forecast.io/forecast/804d6376a63b076c4efe801a2948b761/59.934280,30.335099,2016-05-07T20:25:00/?units=si&lang=ru&exclude=minutely,currently,hourly
-
-
-            console.log(urlWeekAgo);
-            console.log(urlTwoWeeksAgo);
 
 
         https.get(url, function (resp) {

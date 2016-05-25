@@ -1,12 +1,18 @@
 /*jslint nomen: true, node: true, unparam: true*/
 (function () {
     "use strict";
+    // var test = require('./test');
+    // console.log(test);
+
+//     return;
+
     var express = require('express'),
         mysql = require('mysql'),
         sql = require('mssql'),
         mysqlConnection = require(__dirname + '/../dbconnectmysqlnode.js'),
         mssqlConnection = require(__dirname + '/../dbconnectmssqlnode.js'),
         weatherKey = require(__dirname + '/../weatherkey'),
+        forecast = require('./forecast'),
         app,
         https = require('https'),
         // fs = require('fs'),
@@ -291,10 +297,9 @@
                         connection = new sql.Connection(mssqlConnection, function (err) {
 
                             request = new sql.Request(connection);
-                            // this is query for losses 1 week ago
+                            // this is query for losses 2 weeks ago
                             //
                             query = "select sales.gName as good, sum(sales.qty) as qty, code from (select c.Cash_Code as Store, c.Summa as Total, c.Disc_Sum as discount, g.Code as code, g.goodsName as gName, c2.Quant as qty, c2.Price as price, c2.Summa as Sum from Goods4 as g,ChequeHead as c,ChequePos as c2 where g.Code=c2.Code and c2.ChequeId=c.Id and c.DateOperation between '" + dateTwoWeeksAgo + " 12:00' and '" + dateTwoWeeksAgoPlusDay + " 12:00' and c.Cash_Code = " + req.params.id + " and price = 0) as sales group by sales.gName, code";
-
 
                             request.query(query, function (err, recordset) {
                                 var i,
@@ -377,14 +382,6 @@
                 });
             });
         });
-
-        // console.log(dateWeekAgo);
-        // console.log(dateWeekAgoPlusDay);
-        // console.log(dateTwoWeeksAgo);
-        // console.log(dateTwoWeeksAgoPlusDay);
-
-
-        // res.send(JSON.stringify(req.params.date));
     });
 
     app.get('/api/weather/date/:date', function (req, res) {
@@ -465,12 +462,88 @@
         });
     });
 
+    app.get('/api/forecast/store/:store/date/:date/item/:item', function (req, res) {
+        var connection,
+            forecastForItem,
+            salesData,
+            i,
+            j,
+            dateReceived = req.params.date,
+            item = req.params.item,
+            dateArray = dateReceived.split('-'),
+            dateTo = new Date(dateArray[0] + '-' + dateArray[1] + '-' + dateArray[2]),
+            dateToPlusDay = new Date(dateArray[0] + '-' + dateArray[1] + '-' + dateArray[2]),
+            dateFrom = new Date(dateArray[0] + '-' + dateArray[1] + '-' + dateArray[2]),
+            dateFromPlusDay = new Date(dateArray[0] + '-' + dateArray[1] + '-' + dateArray[2]),
+            day = dateFrom.getDay() + 1;
+        dateFrom.setDate(dateFrom.getDate() - 90);
+        dateTo = getDateString(dateTo);
+        dateFrom = getDateString(dateFrom);
+        connection = new sql.Connection(mssqlConnection, function (err) {
+
+            var request = new sql.Request(connection),
+                //this query for all sales 1 and 2 weeks ago
+                //
+                query = "select sales.gName as good, sum(sales.qty) as qty, convert(date, dates) as date, code from (select c.DateOperation as dates, c.Cash_Code as Store, c.Summa as Total, c.Disc_Sum as discount, g.Code as code, g.goodsName as gName, c2.Quant as qty, c2.Price as price, c2.Summa as Sum from Goods4 as g,ChequeHead as c,ChequePos as c2 where g.Code=c2.Code and c2.ChequeId=c.Id and (convert(date,c.DateOperation) <= '" + dateTo + "' and convert(date,c.DateOperation) >= '" + dateFrom + "') and c.Cash_Code = " + req.params.store + " and price > 0 and g.Code = '" + item + "' and DATEPART(dw, c.DateOperation) = " + day + ") as sales group by convert(date, dates), sales.gName, code order by  convert(date, dates) asc";
+
+            request.query(query, function (err, recordset) {
+                salesData = recordset;
+                connection = new sql.Connection(mssqlConnection, function (err) {
+
+                    var request = new sql.Request(connection),
+                        //this query for all losses
+                        //
+                        query = "select sales.gName as good, sum(sales.qty) as qty, convert(date, dates) as date, code from (select c.DateOperation as dates, c.Cash_Code as Store, c.Summa as Total, c.Disc_Sum as discount, g.Code as code, g.goodsName as gName, c2.Quant as qty, c2.Price as price, c2.Summa as Sum from Goods4 as g,ChequeHead as c,ChequePos as c2 where g.Code=c2.Code and c2.ChequeId=c.Id and (convert(date,c.DateOperation) <= '" + dateTo + "' and convert(date,c.DateOperation) >= '" + dateFrom + "') and c.Cash_Code = " + req.params.store + " and price = 0 and g.Code = '" + item + "' and DATEPART(dw, c.DateOperation) = " + day + ") as sales group by convert(date, dates), sales.gName, code order by  convert(date, dates) asc";
+
+                    request.query(query, function (err, recordset) {
+                        for (i = 0; i < salesData.length; i += 1) {
+                            salesData[i].loss = 0;
+                            for (j = 0; j < recordset.length; j += 1){
+                                if(salesData[i].date.toISOString() === recordset[j].date.toISOString()) {
+                                    salesData[i].loss = recordset[j].qty;
+                                    recordset.splice(j,1);
+                                    break;
+                                }
+                            }
+
+                        }
+                        connection = new sql.Connection(mssqlConnection, function (err) {
+
+                            var request = new sql.Request(connection),
+                                //this query for all last sales
+                                //
+                                query = "select sales.gName as good, max(dates) as timeOfLastSale, convert(date, dates) as date, code from (select c.DateOperation as dates, c.Cash_Code as Store, c.Summa as Total, c.Disc_Sum as discount, g.Code as code, g.goodsName as gName, c2.Quant as qty, c2.Price as price, c2.Summa as Sum from Goods4 as g,ChequeHead as c,ChequePos as c2 where g.Code=c2.Code and c2.ChequeId=c.Id and (convert(date,c.DateOperation) <= '" + dateTo + "' and convert(date,c.DateOperation) >= '" + dateFrom + "') and c.Cash_Code = " + req.params.store + " and price > 0 and g.Code = '" + item + "' and DATEPART(dw, c.DateOperation) = " + day + ") as sales group by convert(date, dates), sales.gName, code order by  convert(date, dates) asc";
+                                // query = "select DATEPART(dw, c.DateOperation) as dweek, c.DateOperation as dates, c.Cash_Code as Store, c.Summa as Total, c.Disc_Sum as discount, g.Code as code, g.goodsName as gName, c2.Quant as qty, c2.Price as price, c2.Summa as Sum from Goods4 as g,ChequeHead as c,ChequePos as c2 where g.Code=c2.Code and c2.ChequeId=c.Id and (convert(date,c.DateOperation) <= '" + dateTo + "' and convert(date,c.DateOperation) >= '" + dateFrom + "') and c.Cash_Code = " + req.params.store + " and price > 0 and g.Code = '" + item + "' and DATEPART(dw, c.DateOperation) = 4";
+
+                            request.query(query, function (err, recordset) {
+                                for (i = 0; i < salesData.length; i += 1) {
+                                    for (j = 0; j < recordset.length; j += 1){
+                                        if(salesData[i].date.toISOString() === recordset[j].date.toISOString()) {
+                                            salesData[i].timeOfLastSale = recordset[j].timeOfLastSale;
+                                            recordset.splice(j,1);
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                //now let's count income
+                                //
+                                forecastForItem = forecast(salesData);
+                                console.log(forecastForItem);
+                                res.header("Content-Type", "application/json");
+                                res.send(JSON.stringify(salesData));
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+
     // httpsServer.listen(5555, function () {
-    //     var date = new Date();
-    //     console.log('fv server runs at 5555 ' + __dirname + ' ' + date);
+
     // });
     httpServer.listen(5555, function () {
-        var date = new Date();
-        console.log('fv server runs at 5555 ' + __dirname + ' ' + date);
+
     });
 }());

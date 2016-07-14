@@ -39,7 +39,7 @@
                 averageDemand = 0,
                 prediction;
 
-
+            //let's count incomes, losses, average sales and average demand
             for (i = 0; i < salesData.length; i += 1) {
                 salesData[i].income = salesData[i].qty - salesData[i].loss;
                 salesData[i].totalDemand = salesData[i].qty;
@@ -60,36 +60,52 @@
             }
             averageSales = averageSales / salesData.length;
             averageDemand = averageDemand / salesData.length;
-            //insert data to get proper function shape
-            //
-            salesData[salesData.length] = {
-                qty: 0,
-                loss: 0,
-                income: 0
-            };
-            salesData[salesData.length] = {
-                qty: averageSales * 2,
-                loss: averageSales,
-                income: 0
-            };
-            // console.log(salesData);
-            fillDataToForecast(salesData, matrixToForecast, vectorToForecast);
-            coefficients = normalequation(matrixToForecast, salesData.length, 3, vectorToForecast);
-            // console.log(coefficients);
-            // console.log(averageSales);
-            prediction = -coefficients[1] / (2 * coefficients[2]);
-            var deviation = 0.07,
-                highPercent = 1 + deviation,
-                lowPercent = 1 - deviation;
 
-            if (prediction/averageDemand > highPercent) {
-                prediction = averageDemand * highPercent;
-            } else if (prediction/averageDemand < lowPercent) {
-                prediction = averageDemand * lowPercent;
-            }
-            // console.log('forecast');
-            // console.log(prediction);
-            return prediction;
+            //now let's just return average demand
+            //
+            return averageDemand;
+
+            //
+            // //////////////////////
+            // //   FORECAST PART
+            // //////////////////////
+            //
+            // //insert data to get proper function shape
+            // //
+            // salesData[salesData.length] = {
+            //     qty: 0,
+            //     loss: 0,
+            //     income: 0
+            // };
+            // salesData[salesData.length] = {
+            //     qty: averageSales * 2,
+            //     loss: averageSales,
+            //     income: 0
+            // };
+            //
+            // //here we prepare data to send for normal equation
+            // fillDataToForecast(salesData, matrixToForecast, vectorToForecast);
+            // //let's get coeffs for the function describing behavior of sales
+            // coefficients = normalequation(matrixToForecast, salesData.length, 3, vectorToForecast);
+            //
+            // //here is a maximum (optimum) for function
+            // prediction = -coefficients[1] / (2 * coefficients[2]);
+            //
+            // //let's change model for it to work great
+            // //we not using maximum as forecast, we are using behavior to see the trend and change average demand slightly
+            // //to side where maximum of function is
+            // //
+            // var deviation = 0.07,
+            //     highPercent = 1 + deviation,
+            //     lowPercent = 1 - deviation;
+            //
+            // if (prediction/averageDemand > highPercent) {
+            //     prediction = averageDemand * highPercent;
+            // } else if (prediction/averageDemand < lowPercent) {
+            //     prediction = averageDemand * lowPercent;
+            // }
+            //
+            // return prediction;
         };
 
     module.exports = forecast;

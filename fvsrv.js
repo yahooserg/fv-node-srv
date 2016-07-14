@@ -542,6 +542,20 @@
         });
     });
 
+    app.post('/api/passwordChange/user/:id/password/:password', function (req, res) {
+
+        var query = "call passwordChange(" + req.params.id + ", '" + req.params.password + "')",
+            connection = mysql.createConnection(mysqlConnection);
+
+        connection.connect();
+
+        connection.query(query, function (err, rows, fields) {
+            res.send('OK');
+        });
+
+        connection.end();
+    });
+
     // httpsServer.listen(5555, function () {
 
     // });

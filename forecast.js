@@ -7,13 +7,21 @@
         fillDataToForecast = function (salesData, matrixToForecast, vectorToForecast) {
             var i,
                 qtyOfParams = 3;
+
             for (i = 0; i < salesData.length; i += 1) {
                 matrixToForecast[i * qtyOfParams] = 1;
                 matrixToForecast[i * qtyOfParams + 1] = salesData[i].qty + salesData[i].loss;
                 matrixToForecast[i * qtyOfParams + 2] = Math.pow(matrixToForecast[i * qtyOfParams + 1], 2);
                 vectorToForecast[i] = salesData[i].income;
-                // console.log(matrixToForecast[i * qtyOfParams + 1]);
             }
+            // console.log('order');
+            // for (i = 0; i < salesData.length; i += 1) {
+            //     console.log(matrixToForecast[i * qtyOfParams + 1]);
+            // }
+            // console.log('income');
+            // for (i = 0; i < salesData.length; i += 1) {
+            //     console.log(vectorToForecast[i]);
+            // }
         },
 
         forecast = function (salesData) {
@@ -27,27 +35,61 @@
                 matrixToForecast = [],
                 vectorToForecast = [],
                 coefficients,
-                averageSales;
+                averageSales = 0,
+                averageDemand = 0,
+                prediction;
+
+
             for (i = 0; i < salesData.length; i += 1) {
                 salesData[i].income = salesData[i].qty - salesData[i].loss;
+                salesData[i].totalDemand = salesData[i].qty;
+
                 hours = parseInt(salesData[i].timeOfLastSale.getUTCHours(), 10);
                 minutes = parseInt(salesData[i].timeOfLastSale.getUTCMinutes(), 10);
-                if (hours < 22) {
+                if (salesData[i].loss === 0 && hours < 22) {
                     hoursToEnd = ((22 - hours) - (minutes / 60));
                     hoursFromStart = ((hours - 8) + (minutes / 60));
                     averageSalePerHour = (salesData[i].qty / hoursFromStart);
                     lossesFromSmallOrder = averageSalePerHour * hoursToEnd;
-                    salesData[i].income = salesData[i].income - lossesFromSmallOrder;
+                    salesData[i].income = salesData[i].income - lossesFromSmallOrder ;
+                    salesData[i].totalDemand = salesData[i].qty + lossesFromSmallOrder;
                 }
                 averageSales += salesData[i].qty;
-                console.log(salesData[i].income);
+                averageDemand += salesData[i].totalDemand;
                 // console.log(">"+salesData[i].income + " " + salesData[i].qty + " " + hoursToEnd + " " + hoursFromStart + " " + averageSalePerHour + " " + lossesFromSmallOrder);
             }
             averageSales = averageSales / salesData.length;
+            averageDemand = averageDemand / salesData.length;
+            //insert data to get proper function shape
+            //
+            salesData[salesData.length] = {
+                qty: 0,
+                loss: 0,
+                income: 0
+            };
+            salesData[salesData.length] = {
+                qty: averageSales * 2,
+                loss: averageSales,
+                income: 0
+            };
+            // console.log(salesData);
             fillDataToForecast(salesData, matrixToForecast, vectorToForecast);
             coefficients = normalequation(matrixToForecast, salesData.length, 3, vectorToForecast);
-            console.log(coefficients);
-            return -coefficients[1] / (2 * coefficients[2]);
+            // console.log(coefficients);
+            // console.log(averageSales);
+            prediction = -coefficients[1] / (2 * coefficients[2]);
+            var deviation = 0.07,
+                highPercent = 1 + deviation,
+                lowPercent = 1 - deviation;
+
+            if (prediction/averageDemand > highPercent) {
+                prediction = averageDemand * highPercent;
+            } else if (prediction/averageDemand < lowPercent) {
+                prediction = averageDemand * lowPercent;
+            }
+            // console.log('forecast');
+            // console.log(prediction);
+            return prediction;
         };
 
     module.exports = forecast;

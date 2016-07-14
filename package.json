@@ -2,7 +2,7 @@
   "name": "fvolcheknet",
   "version": "1.0.0",
   "description": "fvolchek.net server",
-  "main": "1.js",
+  "main": "fvsrv.js",
   "dependencies": {
     "express": "^4.13.4",
     "matrixmath": "^2.2.1",
@@ -12,7 +12,7 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon 1.js"
+    "start": "nodemon --harmony fvsrv.js"
   },
   "repository": {
     "type": "git",

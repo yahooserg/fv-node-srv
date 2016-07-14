@@ -223,7 +223,7 @@
             var request = new sql.Request(connection),
                 //this query for all sales 1 and 2 weeks ago
                 //
-                query = "select sales.gName as good, sum(sales.qty) as qty, convert(date, dates) as date, code from (select c.DateOperation as dates, c.Cash_Code as Store, c.Summa as Total, c.Disc_Sum as discount, g.Code as code, g.goodsName as gName, c2.Quant as qty, c2.Price as price, c2.Summa as Sum from Goods4 as g,ChequeHead as c,ChequePos as c2 where g.Code=c2.Code and c2.ChequeId=c.Id and (convert(date,c.DateOperation) = '" + dateWeekAgo + "' or convert(date,c.DateOperation) = '" + dateTwoWeeksAgo + "') and c.Cash_Code = " + req.params.id + " and price > 0) as sales group by convert(date, dates), sales.gName, code";
+                query = "select sales.gName as good, sales.groupName as groupName, sum(sales.qty) as qty, convert(date, dates) as date, code from (select c.DateOperation as dates, c.Cash_Code as Store, c.Summa as Total, c.Disc_Sum as discount, g.Code as code, g.goodsName as gName, ggroup.GroupName as groupName, ggroup.Id as groupID, c2.Quant as qty, c2.Price as price, c2.Summa as Sum from Goods4 as g,ChequeHead as c,ChequePos as c2, GoodsGroup4 as ggroup where g.GroupID = ggroup.Id and g.Code=c2.Code and c2.ChequeId=c.Id and (convert(date,c.DateOperation) = '" + dateWeekAgo + "' or convert(date,c.DateOperation) = '" + dateTwoWeeksAgo + "') and c.Cash_Code = " + req.params.id + " and price > 0) as sales group by convert(date, dates), sales.gName, sales.groupName, code";
 
             request.query(query, function (err, recordset) {
 
@@ -239,6 +239,7 @@
                     result[index] = {
                         good: recordset[i].good,
                         code: recordset[i].code,
+                        group: recordset[i].groupName
                     };
                     if (recordset[i + 1] && recordset[i].code === recordset[i + 1].code) {
                         result[index].qtyOne = recordset[i + 1].qty;

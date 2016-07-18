@@ -531,7 +531,19 @@
         connection.end();
     });
 
-    
+    app.get('/api/userDataCheck/:id', function (req, res) {
+
+        var query = "call userDataCheck(" + req.params.id + ")",
+            connection = mysql.createConnection(mysqlConnection);
+
+        connection.connect();
+
+        connection.query(query, function (err, rows, fields) {
+            res.send(rows);
+        });
+
+        connection.end();
+    });
 
     // app.get('/api/test/', function (req, res) {
     //     // var url = 'http://172.31.36.229:5556/api/test';

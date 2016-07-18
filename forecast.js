@@ -51,7 +51,7 @@
                     hoursFromStart = ((hours - 8) + (minutes / 60));
                     averageSalePerHour = (salesData[i].qty / hoursFromStart);
                     lossesFromSmallOrder = averageSalePerHour * hoursToEnd;
-                    salesData[i].income = salesData[i].income - lossesFromSmallOrder ;
+                    salesData[i].income = salesData[i].income - lossesFromSmallOrder;
                     salesData[i].totalDemand = salesData[i].qty + lossesFromSmallOrder;
                 }
                 averageSales += salesData[i].qty;

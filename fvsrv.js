@@ -6,17 +6,17 @@
     //     return;
 
     var express = require('express'),
+        app = express(),
         mysql = require('mysql'),
         sql = require('mssql'),
         mysqlConnection = require(__dirname + '/../dbconnectmysqlnode.js'),
         mssqlConnection = require(__dirname + '/../dbconnectmssqlnode.js'),
         weatherKey = require(__dirname + '/../weatherkey'),
         forecast = require('./forecast'),
-        app = express(),
-        https = require('https'),
         myFunctions = require('./myfunctions'),
         getTimeString = myFunctions.getTimeString,
         getDateString = myFunctions.getDateString,
+        https = require('https'),
         // fs = require('fs'),
         // privateKey,
         // certificate,
@@ -31,11 +31,16 @@
     // certificate = fs.readFileSync(__dirname + '/../ssl.crt');
     // credentials = {key: privateKey, cert: certificate};
     // httpsServer = https.createServer(credentials, app);
+    // httpsServer.listen(5555, function () {
+    // });
 
     //COMMENT FOR production
     //
     http = require('http');
     httpServer = http.createServer(app);
+    httpServer.listen(5555, function () {
+        console.log('start');
+    });
 
     //after serve all app via node (no apache or php) you have to add http and redirection to https with something like following:
     // var redirectApp = express () ,
@@ -526,10 +531,23 @@
         connection.end();
     });
 
-    // httpsServer.listen(5555, function () {
+    
 
+    // app.get('/api/test/', function (req, res) {
+    //     // var url = 'http://172.31.36.229:5556/api/test';
+    //     var url = 'http://127.0.0.1:5556/api/test';
+    //
+    //     http.get(url, function (resp) {
+    //         resp.on('data', function (d) {
+    //             d = JSON.parse(d);
+    //             console.log(req.path);
+    //
+    //             // res.header("Content-Type", "application/json");
+    //             // res.send(dataToSend);
+    //         });
+    //     });
+    //     res.header("Content-Type", "application/json");
+    //     res.send(JSON.stringify({forecast: 1, date: 2}));
     // });
-    httpServer.listen(5555, function () {
-        console.log('start');
-    });
+
 }());

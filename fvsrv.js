@@ -6,6 +6,7 @@
     //     return;
 
     var express = require('express'),
+        cookieParser = require('cookie-parser'),
         app = express(),
         mysql = require('mysql'),
         sql = require('mssql'),
@@ -58,9 +59,16 @@
 
     // app.use(express.static(__dirname + '/../fvolcheknet')); //use this when get rid of apache and php
 
+    app.use(cookieParser());
+
     app.use(function (req, res, next) {
-        res.header("Access-Control-Allow-Origin", "*");
-        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        var allowedOrigins = ['http://1.local', 'https://fvolchek.net', 'https://www.fvolchek.net'],
+            origin = req.headers.origin;
+        if (allowedOrigins.indexOf(origin) > -1) {
+            res.setHeader('Access-Control-Allow-Origin', origin);
+        }
+        res.header("Access-Control-Allow-Credentials", "true");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Cookie");
         next();
     });
 
@@ -543,6 +551,13 @@
         });
 
         connection.end();
+    });
+
+    app.get('/api/users/', function (req, res) {
+
+        console.log('Cookies: ', req.cookies);
+        res.send('OK');
+
     });
 
     // app.get('/api/test/', function (req, res) {

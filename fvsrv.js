@@ -6,7 +6,7 @@
     //     return;
 
     var express = require('express'),
-        cookieParser = require('cookie-parser'),
+        // cookieParser = require('cookie-parser'),
         app = express(),
         mysql = require('mysql'),
         sql = require('mssql'),
@@ -59,7 +59,7 @@
 
     // app.use(express.static(__dirname + '/../fvolcheknet')); //use this when get rid of apache and php
 
-    app.use(cookieParser());
+    // app.use(cookieParser());
 
     app.use(function (req, res, next) {
         var allowedOrigins = ['http://1.local', 'https://fvolchek.net', 'https://www.fvolchek.net'],
@@ -67,8 +67,9 @@
         if (allowedOrigins.indexOf(origin) > -1) {
             res.setHeader('Access-Control-Allow-Origin', origin);
         }
-        res.header("Access-Control-Allow-Credentials", "true");
-        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Cookie");
+        // res.header("Access-Control-Allow-Credentials", "true");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        res.header("Access-Control-Allow-Methods", "DELETE");
         next();
     });
 
@@ -553,10 +554,66 @@
         connection.end();
     });
 
-    app.get('/api/users/', function (req, res) {
+    app.get('/api/users/user/:id/token/:token', function (req, res) {
 
-        console.log('Cookies: ', req.cookies);
-        res.send('OK');
+        var query = "call getUsers(" + req.params.id + ", " + req.params.token + ")",
+            connection = mysql.createConnection(mysqlConnection);
+
+        connection.connect();
+
+        connection.query(query, function (err, rows, fields) {
+            res.send(rows[0]);
+        });
+
+        connection.end();
+
+    });
+
+    app.delete('/api/user/:id/token/:token/userToDelete/:userToDelete', function (req, res) {
+
+        var query = "call deleteUser(" + req.params.id + ", " + req.params.token + ", " + req.params.userToDelete + ")",
+            connection = mysql.createConnection(mysqlConnection);
+            console.log(query);
+
+        connection.connect();
+
+        connection.query(query, function (err, rows, fields) {
+            res.send(rows);
+        });
+
+        connection.end();
+
+    });
+
+    app.delete('/api/user/:id/token/:token/userToDelete/:userToDelete', function (req, res) {
+
+        var query = "call deleteUser(" + req.params.id + ", " + req.params.token + ", " + req.params.userToDelete + ")",
+            connection = mysql.createConnection(mysqlConnection);
+            console.log(query);
+
+        connection.connect();
+
+        connection.query(query, function (err, rows, fields) {
+            res.send(rows);
+        });
+
+        connection.end();
+
+    });
+
+    app.put('/api/user/:id/token/:token/userToDelete/:userToDelete', function (req, res) {
+
+        var query = "call deleteUser(" + req.params.id + ", " + req.params.token + ", " + req.params.userToDelete + ")",
+            connection = mysql.createConnection(mysqlConnection);
+            console.log(query);
+
+        connection.connect();
+
+        connection.query(query, function (err, rows, fields) {
+            res.send(rows);
+        });
+
+        connection.end();
 
     });
 

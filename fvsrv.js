@@ -69,7 +69,7 @@
         }
         // res.header("Access-Control-Allow-Credentials", "true");
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-        res.header("Access-Control-Allow-Methods", "DELETE");
+        res.header("Access-Control-Allow-Methods", "DELETE, PUT");
         next();
     });
 
@@ -573,7 +573,6 @@
 
         var query = "call deleteUser(" + req.params.id + ", " + req.params.token + ", " + req.params.userToDelete + ")",
             connection = mysql.createConnection(mysqlConnection);
-            console.log(query);
 
         connection.connect();
 
@@ -585,27 +584,10 @@
 
     });
 
-    app.delete('/api/user/:id/token/:token/userToDelete/:userToDelete', function (req, res) {
+    app.put('/api/user/:id/token/:token/userFirstName/:firstName/userLastName/:lastName/userEmail/:email', function (req, res) {
 
-        var query = "call deleteUser(" + req.params.id + ", " + req.params.token + ", " + req.params.userToDelete + ")",
+        var query = "call addUser(" + req.params.id + ", " + req.params.token + ", '" + req.params.firstName + "', '" + req.params.lastName + "', '" + req.params.email + "')",
             connection = mysql.createConnection(mysqlConnection);
-            console.log(query);
-
-        connection.connect();
-
-        connection.query(query, function (err, rows, fields) {
-            res.send(rows);
-        });
-
-        connection.end();
-
-    });
-
-    app.put('/api/user/:id/token/:token/userToDelete/:userToDelete', function (req, res) {
-
-        var query = "call deleteUser(" + req.params.id + ", " + req.params.token + ", " + req.params.userToDelete + ")",
-            connection = mysql.createConnection(mysqlConnection);
-            console.log(query);
 
         connection.connect();
 

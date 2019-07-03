@@ -18,30 +18,30 @@
         getTimeString = myFunctions.getTimeString,
         getDateString = myFunctions.getDateString,
         https = require('https'),
-        // fs = require('fs'),
-        // privateKey,
-        // certificate,
-        // credentials,
-        // httpsServer;
-        http,
-        httpServer;
+        fs = require('fs'),
+        privateKey,
+        certificate,
+        credentials,
+        httpsServer;
+        // http,
+        // httpServer;
 
     //UNCOMMENT FOR production
     //
-    // privateKey = fs.readFileSync(__dirname + '/../ssl.key');
-    // certificate = fs.readFileSync(__dirname + '/../ssl.crt');
-    // credentials = {key: privateKey, cert: certificate};
-    // httpsServer = https.createServer(credentials, app);
-    // httpsServer.listen(5555, function () {
-    // });
+    privateKey = fs.readFileSync(__dirname + '/../ssl.key');
+    certificate = fs.readFileSync(__dirname + '/../ssl.crt');
+    credentials = {key: privateKey, cert: certificate};
+    httpsServer = https.createServer(credentials, app);
+    httpsServer.listen(5555, function () {
+    });
 
     //COMMENT FOR production
     //
-    http = require('http');
-    httpServer = http.createServer(app);
-    httpServer.listen(5555, function () {
-        console.log('start');
-    });
+    // http = require('http');
+    // httpServer = http.createServer(app);
+    // httpServer.listen(5555, function () {
+    //     console.log('start');
+    // });
 
     //after serve all app via node (no apache or php) you have to add http and redirection to https with something like following:
     // var redirectApp = express () ,
@@ -75,17 +75,18 @@
 
     app.get('/api/storedata/store/:id/date/:date', function (req, res) {
 
-        var connection = new sql.Connection(mssqlConnection, function (err) {
-
-            var request = new sql.Request(connection),
-                query = "select sum(c.Summa) as total, count(c.Summa) as checks from ChequeHead as c where convert(date,c.DateOperation) = '" + req.params.date + "' and c.Cash_Code = " + req.params.id;
-
-            request.query(query, function (err, recordset) {
-                // console.info(recordset);
-                res.header("Content-Type", "application/json");
-                res.send(JSON.stringify(recordset[0]));
-            });
-        });
+        // var connection = new sql.Connection(mssqlConnection, function (err) {
+        //
+        //     var request = new sql.Request(connection),
+        //         query = "select sum(c.Summa) as total, count(c.Summa) as checks from ChequeHead as c where convert(date,c.DateOperation) = '" + req.params.date + "' and c.Cash_Code = " + req.params.id;
+        //
+        //     request.query(query, function (err, recordset) {
+        //         // console.info(recordset);
+        //         res.header("Content-Type", "application/json");
+        //         res.send(JSON.stringify(recordset[0]));
+        //     });
+        // });
+        res.send("OK");
     });
 
     app.post('/api/log/user/:id/action/:action', function (req, res) {
@@ -104,47 +105,48 @@
 
     app.get('/api/receipts/store/:id/date/:date', function (req, res) {
 
-        var connection = new sql.Connection(mssqlConnection, function (err) {
-
-            var request = new sql.Request(connection),
-                query = "select c.Cash_Code as Store, c2.chequeID, c.Ck_Number as Ch,c.Summa as Total, c.Disc_Sum as discount, g.Code as code, g.goodsName as gName, c2.Quant as qty, c2.Price as price, c2.Summa as Sum, convert(date,c.DateOperation) as date,convert(char(8),c.DateOperation,108)as time from Goods4 as g,ChequeHead as c,ChequePos as c2 where g.Code=c2.Code and c2.ChequeId=c.Id and convert(date,c.DateOperation) = '" + req.params.date + "' and c.Cash_Code = " + req.params.id + " order by c2.ChequeId desc";
-
-            request.query(query, function (err, recordset) {
-                // console.info(recordset);
-                var result = {}, i = 0, resultArray = [];
-                for (i = 0; i < recordset.length; i += 1) {
-                    if (!result[recordset[i].Ch]) {
-                        result[recordset[i].Ch] = {};
-                        // console.log(typeof 'recordset.Ch');
-                    }
-                    if (!result[recordset[i].Ch].number) {
-                        result[recordset[i].Ch].number = recordset[i].Ch;
-                        result[recordset[i].Ch].total = recordset[i].Total;
-                        result[recordset[i].Ch].discount = recordset[i].discount;
-                        result[recordset[i].Ch].time = recordset[i].time;
-                    }
-                    if (!result[recordset[i].Ch].goods) {
-                        result[recordset[i].Ch].goods = [];
-                    }
-                    result[recordset[i].Ch].goods[result[recordset[i].Ch].goods.length] = {};
-                    result[recordset[i].Ch].goods[result[recordset[i].Ch].goods.length - 1].code = recordset[i].code;
-                    result[recordset[i].Ch].goods[result[recordset[i].Ch].goods.length - 1].name = recordset[i].gName;
-                    result[recordset[i].Ch].goods[result[recordset[i].Ch].goods.length - 1].price = recordset[i].price;
-                    result[recordset[i].Ch].goods[result[recordset[i].Ch].goods.length - 1].qty = recordset[i].qty;
-                    result[recordset[i].Ch].goods[result[recordset[i].Ch].goods.length - 1].sum = recordset[i].Sum;
-                }
-                //loop through all properties and make a result array
-                for (i in result) {
-                    if (result.hasOwnProperty(i)) {
-                        resultArray[resultArray.length] = result[i];
-                    }
-                }
-
-                res.header("Content-Type", "application/json");
-                res.send(JSON.stringify(resultArray));
-                // res.send(JSON.stringify(recordset));
-            });
-        });
+        // var connection = new sql.Connection(mssqlConnection, function (err) {
+        //
+        //     var request = new sql.Request(connection),
+        //         query = "select c.Cash_Code as Store, c2.chequeID, c.Ck_Number as Ch,c.Summa as Total, c.Disc_Sum as discount, g.Code as code, g.goodsName as gName, c2.Quant as qty, c2.Price as price, c2.Summa as Sum, convert(date,c.DateOperation) as date,convert(char(8),c.DateOperation,108)as time from Goods4 as g,ChequeHead as c,ChequePos as c2 where g.Code=c2.Code and c2.ChequeId=c.Id and convert(date,c.DateOperation) = '" + req.params.date + "' and c.Cash_Code = " + req.params.id + " order by c2.ChequeId desc";
+        //
+        //     request.query(query, function (err, recordset) {
+        //         // console.info(recordset);
+        //         var result = {}, i = 0, resultArray = [];
+        //         for (i = 0; i < recordset.length; i += 1) {
+        //             if (!result[recordset[i].Ch]) {
+        //                 result[recordset[i].Ch] = {};
+        //                 // console.log(typeof 'recordset.Ch');
+        //             }
+        //             if (!result[recordset[i].Ch].number) {
+        //                 result[recordset[i].Ch].number = recordset[i].Ch;
+        //                 result[recordset[i].Ch].total = recordset[i].Total;
+        //                 result[recordset[i].Ch].discount = recordset[i].discount;
+        //                 result[recordset[i].Ch].time = recordset[i].time;
+        //             }
+        //             if (!result[recordset[i].Ch].goods) {
+        //                 result[recordset[i].Ch].goods = [];
+        //             }
+        //             result[recordset[i].Ch].goods[result[recordset[i].Ch].goods.length] = {};
+        //             result[recordset[i].Ch].goods[result[recordset[i].Ch].goods.length - 1].code = recordset[i].code;
+        //             result[recordset[i].Ch].goods[result[recordset[i].Ch].goods.length - 1].name = recordset[i].gName;
+        //             result[recordset[i].Ch].goods[result[recordset[i].Ch].goods.length - 1].price = recordset[i].price;
+        //             result[recordset[i].Ch].goods[result[recordset[i].Ch].goods.length - 1].qty = recordset[i].qty;
+        //             result[recordset[i].Ch].goods[result[recordset[i].Ch].goods.length - 1].sum = recordset[i].Sum;
+        //         }
+        //         //loop through all properties and make a result array
+        //         for (i in result) {
+        //             if (result.hasOwnProperty(i)) {
+        //                 resultArray[resultArray.length] = result[i];
+        //             }
+        //         }
+        //
+        //         res.header("Content-Type", "application/json");
+        //         res.send(JSON.stringify(resultArray));
+        //         // res.send(JSON.stringify(recordset));
+        //     });
+        // });
+        res.send("OK");
     });
 
     app.get('/api/hourlystats/store/:id/date/:date/datefrom/:datefrom', function (req, res) {
@@ -554,14 +556,15 @@
         connection.end();
     });
 
-    app.get('/api/users/user/:id/token/:token', function (req, res) {
+    app.get('/api/users/user/:id/token/:token/type/:type', function (req, res) {
 
-        var query = "call getUsers(" + req.params.id + ", " + req.params.token + ")",
+        var query = "call getUsers(" + req.params.id + ", " + req.params.token + ","+ req.params.type +")",
             connection = mysql.createConnection(mysqlConnection);
 
         connection.connect();
 
         connection.query(query, function (err, rows, fields) {
+          console.log(rows);
             res.send(rows[0]);
         });
 
@@ -584,9 +587,9 @@
 
     });
 
-    app.put('/api/user/:id/token/:token/userFirstName/:firstName/userLastName/:lastName/userEmail/:email', function (req, res) {
+    app.put('/api/user/:id/token/:token/userFirstName/:firstName/userLastName/:lastName/userEmail/:email/type/:type', function (req, res) {
 
-        var query = "call addUser(" + req.params.id + ", " + req.params.token + ", '" + req.params.firstName + "', '" + req.params.lastName + "', '" + req.params.email + "')",
+        var query = "call addUser(" + req.params.id + ", " + req.params.token + ", '" + req.params.firstName + "', '" + req.params.lastName + "', '" + req.params.email + "',"+ req.params.type +")",
             connection = mysql.createConnection(mysqlConnection);
 
         connection.connect();

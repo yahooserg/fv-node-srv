@@ -27,5 +27,6 @@
           console.log(data);
         });
       };
-    setInterval(revenueStore, 3000);
+    revenueStore();
+    // setInterval(revenueStore, 30000);
 }());

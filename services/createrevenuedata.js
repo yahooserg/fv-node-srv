@@ -14,7 +14,7 @@
     module.exports = {
         getDataFromDB: function (callback) {
 
-          var query = "select * from stores where bakery < 1000;",
+          var query = "select id, bakery, name from stores where bakery < 1000 order by bakery;",
           connection = mysql.createConnection(mysqlConnection),
           data = [];
           connection.connect();

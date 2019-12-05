@@ -15,7 +15,7 @@
           // Query
           new sql.Request().query('select 1 as number', (err, result) => {
               // ... error checks
-              console.dir(result)
+              console.log("resulte: ", result)
           })
         })
           // var connection = new sql.Connection(mssqlConnection, function (err) {

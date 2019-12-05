@@ -80,6 +80,7 @@
                     bakeryData.monthBeforeLastMonth.average = Math.ceil(bakeryData.monthBeforeLastMonth.revenue/bakeryData.monthBeforeLastMonth.checks);
 
                     data[j].bakeryData = bakeryData;
+                    console.log(bakeryData);
 
                 })
               }

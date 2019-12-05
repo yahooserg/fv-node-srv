@@ -24,7 +24,8 @@
               for(j = 0; j < rows.length; j += 1) {
                 data[j] = {
                   name: "№ " + rows[j].bakery + " " + rows[j].name,
-                  id: rows[j].id
+                  id: rows[j].id,
+                  bakeryData = {};
                 };
                 // console.log("Error: ", err);
                 // Query

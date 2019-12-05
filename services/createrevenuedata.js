@@ -46,7 +46,7 @@
                 if(i<8) {
                   bakeryData.eightDays.revenue[7-i] = result.recordset[i].cash;
                   bakeryData.eightDays.checks[7-i] = result.recordset[i].checks;
-                  bakeryData.eightDays.average[7-i] = result.recordset[i].cash/result.recordset[i].checks;
+                  bakeryData.eightDays.average[7-i] = Math.ceil(result.recordset[i].cash/result.recordset[i].checks);
                 }
                 if(currentMonth === result.recordset[i].month) {
                   bakeryData.thisMonth.revenue += result.recordset[i].cash;
@@ -61,9 +61,9 @@
                 }
 
               }
-              bakeryData.thisMonth.average = bakeryData.thisMonth.revenue/bakeryData.thisMonth.checks;
-              bakeryData.lastMonth.average = bakeryData.lastMonth.revenue/bakeryData.lastMonth.checks;
-              bakeryData.monthBeforeLastMonth.average = bakeryData.monthBeforeLastMonth.revenue/bakeryData.monthBeforeLastMonth.checks;
+              bakeryData.thisMonth.average = Math.ceil(bakeryData.thisMonth.revenue/bakeryData.thisMonth.checks);
+              bakeryData.lastMonth.average = Math.ceil(bakeryData.lastMonth.revenue/bakeryData.lastMonth.checks);
+              bakeryData.monthBeforeLastMonth.average = Math.ceil(bakeryData.monthBeforeLastMonth.revenue/bakeryData.monthBeforeLastMonth.checks);
 
               console.log("resulte: ", bakeryData);
 

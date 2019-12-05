@@ -14,10 +14,12 @@
         sql.connect(config, err => {
           console.log("Error: ", err);
           // Query
-          new sql.Request().query('select 1;', (err, result) => {
+          var query = "select sum(t1.nationalsum)as cash, count(t1.nationalsum) as checks, t1.IPRINTSTATION as cassa, day(t1.CLOSEDATETIME) as day, month(t1.CLOSEDATETIME) as month, DATEPART(dw,t1.CLOSEDATETIME) as dw from  [RK7].[dbo].[PRINTCHECKS] as t1 where year(t1.CLOSEDATETIME) = year(getdate()) and month(t1.CLOSEDATETIME) >= month(getdate())-2 and t1.IPRINTSTATION = 15101 group by t1.IPRINTSTATION, day(t1.CLOSEDATETIME), month(t1.CLOSEDATETIME), DATEPART(dw,t1.CLOSEDATETIME) order by cassa, month desc, day desc;";
+          const request = new sql.Request();
+          request.query(query, (err, result) => {
               console.log("Error: ", err);
               // ... error checks
-              console.log("resulte: ", result)
+              console.log("resulte: ", result);
           })
         })
           // var connection = new sql.Connection(mssqlConnection, function (err) {

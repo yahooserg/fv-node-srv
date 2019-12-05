@@ -2,8 +2,11 @@
 (function () {
     "use strict";
     var config = require(__dirname + '/../../dbconnectmssqlnode.js'),
-        myFunctions = require('./myfunctions');
-    const sql = require('mssql');
+      mysqlConnection = require(__dirname + '/../../dbconnectmysqlnode.js'),
+      myFunctions = require('./myfunctions');
+    const sql = require('mssql'),
+      mysql = require('mysql');
+
     sql.on('error', err => {
       console.log("Error in SQL: ", err);
     })
@@ -11,10 +14,19 @@
     module.exports = {
         getDataFromDB: function (callback) {
 
+          var query = "select * from stores;",
+          connection = mysql.createConnection(mysqlConnection);
+          connection.connect();
+          connection.query(query, function (err, rows, fields) {
+              console.log(rows);
+          });
+          connection.end();
+          var bakeryID = 15101;
+
         sql.connect(config, err => {
           // console.log("Error: ", err);
           // Query
-          var query = "select sum(t1.nationalsum)as cash, count(t1.nationalsum) as checks, t1.IPRINTSTATION as cassa, day(t1.CLOSEDATETIME) as day, month(t1.CLOSEDATETIME) as month, DATEPART(dw,t1.CLOSEDATETIME) as dw from  [RK7].[dbo].[PRINTCHECKS] as t1 where year(t1.CLOSEDATETIME) = year(getdate()) and month(t1.CLOSEDATETIME) >= month(getdate())-2 and t1.IPRINTSTATION = 15101 group by t1.IPRINTSTATION, day(t1.CLOSEDATETIME), month(t1.CLOSEDATETIME), DATEPART(dw,t1.CLOSEDATETIME) order by cassa, month desc, day desc;";
+          var query = "select sum(t1.nationalsum)as cash, count(t1.nationalsum) as checks, t1.IPRINTSTATION as cassa, day(t1.CLOSEDATETIME) as day, month(t1.CLOSEDATETIME) as month, DATEPART(dw,t1.CLOSEDATETIME) as dw from  [RK7].[dbo].[PRINTCHECKS] as t1 where year(t1.CLOSEDATETIME) = year(getdate()) and month(t1.CLOSEDATETIME) >= month(getdate())-2 and t1.IPRINTSTATION = " + bakeryID + " group by t1.IPRINTSTATION, day(t1.CLOSEDATETIME), month(t1.CLOSEDATETIME), DATEPART(dw,t1.CLOSEDATETIME) order by cassa, month desc, day desc;";
           const request = new sql.Request();
           request.query(query, (err, result) => {
               // ... error checks

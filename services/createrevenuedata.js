@@ -1,7 +1,7 @@
 /*jslint nomen: true, node: true*/
 (function () {
     "use strict";
-    var mssqlConnection = require(__dirname + '/../../dbconnectmssqlnode.js'),
+    var config = require(__dirname + '/../../dbconnectmssqlnode.js'),
         myFunctions = require('./myfunctions');
     const sql = require('mssql');
     sql.on('error', err => {
@@ -32,7 +32,7 @@
           //         callback(connection);
           //     });
           // });
-            callback(mssqlConnection);
+            callback(config);
         },
         getDateString: function (date) {
             var day = date.getDate(),

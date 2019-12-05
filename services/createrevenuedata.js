@@ -26,7 +26,7 @@
                   id: rows[j].id
                 };
               }
-              console.log("data");
+              console.log(data);
           });
           connection.end();
           var bakeryID = 15101;

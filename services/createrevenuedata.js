@@ -14,7 +14,7 @@
     module.exports = {
         getDataFromDB: function (callback) {
 
-          var query = "select id, bakery, name from stores where bakery < 1000;",
+          var query = "select * from stores where bakery < 1000;",
           connection = mysql.createConnection(mysqlConnection),
           data = [];
           connection.connect();
@@ -26,6 +26,7 @@
                   id: rows[j].id
                 };
               }
+              console.log("data");
           });
           connection.end();
           var bakeryID = 15101;

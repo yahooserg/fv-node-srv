@@ -14,8 +14,11 @@
                   query = "select 1;";
 
               request.query(query, function (err, recordset) {
+                console.info(mssqlConnection);
+
                   console.info(err);
-                  callback(JSON.stringify(connection));
+                  // callback(JSON.stringify(connection));
+                  callback(connection);
               });
           });
             // callback(mssqlConnection);

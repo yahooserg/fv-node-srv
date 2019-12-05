@@ -12,6 +12,7 @@
         getDataFromDB: function (callback) {
 
         sql.connect(config, err => {
+          console.log("Error: ", err);
           // Query
           new sql.Request().query('select 1;', (err, result) => {
               console.log("Error: ", err);

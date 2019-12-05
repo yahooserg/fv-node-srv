@@ -13,7 +13,8 @@
 
         sql.connect(config, err => {
           // Query
-          new sql.Request().query('select 1 as number', (err, result) => {
+          new sql.Request().query('select 1;', (err, result) => {
+              console.log("Error: ", err);
               // ... error checks
               console.log("resulte: ", result)
           })

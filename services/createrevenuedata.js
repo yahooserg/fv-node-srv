@@ -39,7 +39,7 @@
                   revenue: 0,
                   checks: 0,
                   average: 0
-                };
+                }
               };
               var currentMonth = result.recordset[0].month;
               for (i = 0; i < results.recordset.length; i += 1) {

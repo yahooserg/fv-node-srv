@@ -11,10 +11,11 @@
         mysql = require('mysql'),
         sql = require('mssql'),
         mysqlConnection = require(__dirname + '/../dbconnectmysqlnode.js'),
-        mssqlConnection = require(__dirname + '/../dbconnectmssqlnode.js'),
-        weatherKey = require(__dirname + '/../weatherkey'),
-        forecast = require('./forecast'),
-        myFunctions = require('./myfunctions'),
+        // mssqlConnection = require(__dirname + '/../dbconnectmssqlnode.js'),
+        // weatherKey = require(__dirname + '/../weatherkey'),
+        // forecast = require('./forecast'),
+        myFunctions = require('./services/myfunctions'),
+        createRevenueData = require('./services/createrevenuedata.js'),
         getTimeString = myFunctions.getTimeString,
         getDateString = myFunctions.getDateString,
         https = require('https'),
@@ -623,5 +624,13 @@
     //     res.header("Content-Type", "application/json");
     //     res.send(JSON.stringify({forecast: 1, date: 2}));
     // });
+
+    var revenueStore = function () {
+      createRevenueData.getDataFromDB(function (data) {
+        console.log(data);
+      });
+    };
+
+    setInterval(revenueStore, 3000);
 
 }());

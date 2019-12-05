@@ -42,7 +42,7 @@
                 }
               };
               var currentMonth = result.recordset[0].month;
-              for (i = 0; i < results.recordset.length; i += 1) {
+              for (var i = 0; i < results.recordset.length; i += 1) {
                 if(i<8) {
                   bakeryData.eightDays.revenue[7-i] = result.recordset[i].cash;
                   bakeryData.eightDays.checks[7-i] = result.recordset[i].checks;

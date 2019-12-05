@@ -14,11 +14,18 @@
     module.exports = {
         getDataFromDB: function (callback) {
 
-          var query = "select * from stores;",
-          connection = mysql.createConnection(mysqlConnection);
+          var query = "select id, bakery, name from stores where bakery < 1000;",
+          connection = mysql.createConnection(mysqlConnection),
+          data = [];
           connection.connect();
           connection.query(query, function (err, rows, fields) {
-              console.log(rows);
+              var j = 0;
+              for(j = 0; j < rows.length; j += 1) {
+                data[j] = {
+                  name: "№ " + rows[j].bakery + " " + rows[j].name,
+                  id: rows[j].id
+                };
+              }
           });
           connection.end();
           var bakeryID = 15101;

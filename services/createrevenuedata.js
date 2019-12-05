@@ -25,7 +25,7 @@
                 data[j] = {
                   name: "№ " + rows[j].bakery + " " + rows[j].name,
                   id: rows[j].id,
-                  bakeryData = {};
+                  bakeryData: {}
                 };
                 // console.log("Error: ", err);
                 // Query

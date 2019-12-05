@@ -10,6 +10,14 @@
 
     module.exports = {
         getDataFromDB: function (callback) {
+
+        sql.connect(config, err => {
+          // Query
+          new sql.Request().query('select 1 as number', (err, result) => {
+              // ... error checks
+              console.dir(result)
+          })
+        })
           // var connection = new sql.Connection(mssqlConnection, function (err) {
           //
           //     var request = new sql.Request(connection),

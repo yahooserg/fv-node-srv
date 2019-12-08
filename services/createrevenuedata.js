@@ -28,7 +28,9 @@
                   bakeryData: {}
                 };
                 msSQLJob (data[j].id, function (bakeryData, index) {
-                  data[index].bakeryData = bakeryData;
+                  console.log(data[index]);
+                  console.log(bakeryData);
+
                 });
               }
               console.log(data);

@@ -27,7 +27,7 @@
                   id: rows[j].id,
                   bakeryData: {}
                 };
-                msSQLJob (data[j].id, data, function (bakeryData, index) {
+                msSQLJob (data[j].id, function (bakeryData, index) {
                   data[index].bakeryData = bakeryData;
                 });
               }

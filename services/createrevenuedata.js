@@ -31,7 +31,7 @@
                   data[index].bakeryData = bakeryData;
                 });
               }
-              // console.log(data);
+              console.log(data);
             })
           });
           connection.end();

@@ -28,7 +28,7 @@
                   bakeryData: {}
                 };
                 msSQLJob (data[j].id, function (bakeryData, index) {
-                  // data[index].bakeryData = bakeryData;
+                  data[index].bakeryData = bakeryData;
                 });
               }
               console.log(data);
@@ -40,7 +40,7 @@
 
     var msSQLJob = function (bakery, callback) {
       console.log("in JOB: ", bakery);
-      return 0;
+      // return 0;
       // Query
       var query = "select sum(t1.nationalsum)as cash, count(t1.nationalsum) as checks, t1.IPRINTSTATION as cassa, day(t1.CLOSEDATETIME) as day, month(t1.CLOSEDATETIME) as month, DATEPART(dw,t1.CLOSEDATETIME) as dw from  [RK7].[dbo].[PRINTCHECKS] as t1 where year(t1.CLOSEDATETIME) = year(getdate()) and month(t1.CLOSEDATETIME) >= month(getdate())-2 and t1.IPRINTSTATION = " + bakery + " group by t1.IPRINTSTATION, day(t1.CLOSEDATETIME), month(t1.CLOSEDATETIME), DATEPART(dw,t1.CLOSEDATETIME) order by cassa, month desc, day desc;";
       const request = new sql.Request();

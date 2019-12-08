@@ -27,11 +27,11 @@
                   id: rows[j].id,
                   bakeryData: {}
                 };
-                msSQLJob (data[j].id, function (bakeryData) {
-                  data[j].bakeryData = bakeryData;
+                msSQLJob (data[j].id, data, function (bakeryData, index) {
+                  data[index].bakeryData = bakeryData;
                 });
               }
-              console.log(data);
+              // console.log(data);
             })
           });
           connection.end();
@@ -39,7 +39,7 @@
     };
 
     var msSQLJob = function (bakery, callback) {
-      console.log("in JOB: ", bakery);
+      // console.log("in JOB: ", bakery);
       // Query
       return 0;
       var query = "select sum(t1.nationalsum)as cash, count(t1.nationalsum) as checks, t1.IPRINTSTATION as cassa, day(t1.CLOSEDATETIME) as day, month(t1.CLOSEDATETIME) as month, DATEPART(dw,t1.CLOSEDATETIME) as dw from  [RK7].[dbo].[PRINTCHECKS] as t1 where year(t1.CLOSEDATETIME) = year(getdate()) and month(t1.CLOSEDATETIME) >= month(getdate())-2 and t1.IPRINTSTATION = " + bakery + " group by t1.IPRINTSTATION, day(t1.CLOSEDATETIME), month(t1.CLOSEDATETIME), DATEPART(dw,t1.CLOSEDATETIME) order by cassa, month desc, day desc;";
@@ -93,7 +93,7 @@
           bakeryData.lastMonth.average = Math.ceil(bakeryData.lastMonth.revenue/bakeryData.lastMonth.checks);
           bakeryData.monthBeforeLastMonth.average = Math.ceil(bakeryData.monthBeforeLastMonth.revenue/bakeryData.monthBeforeLastMonth.checks);
 
-          callback(bakeryData);
+          callback(bakeryData, bakery);
           // console.log(bakeryData);
 
       })

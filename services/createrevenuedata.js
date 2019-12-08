@@ -94,7 +94,7 @@
           bakeryData.monthBeforeLastMonth.average = Math.ceil(bakeryData.monthBeforeLastMonth.revenue/bakeryData.monthBeforeLastMonth.checks);
 
           callback(bakeryData, bakery);
-          // console.log(bakeryData);
+          console.log(bakeryData);
 
       })
 

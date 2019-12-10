@@ -83,8 +83,8 @@
                     bakeryData.monthBeforeLastMonth.average = Math.ceil(bakeryData.monthBeforeLastMonth.revenue/bakeryData.monthBeforeLastMonth.checks);
 
                     data[j].bakeryData = bakeryData;
-                    if (j < rows.length) {
-                      msSQLJob (j + 1, rows);
+                    if (j < rows.length - 1) {
+                      msSQLJob (j + 1);
                     } else {
                       callback(data);
                     }

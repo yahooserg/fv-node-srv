@@ -23,7 +23,7 @@
               // var j = 0,
               //   z = 0;
               // for(j = 0; j < rows.length; j += 1) {
-              var msSQLJob = function (j) {
+              var msSQLJob = function (j, rows) {
                 // console.log("in JOB: ", bakery);
                 // Query
                 data[j] = {
@@ -84,7 +84,7 @@
 
                     data[j].bakeryData = bakeryData;
                     if (j < rows.length) {
-                      msSQLJob (j + 1);
+                      msSQLJob (j + 1, rows);
                     } else {
                       callback(data);
                     }

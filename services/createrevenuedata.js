@@ -20,7 +20,8 @@
           connection.connect();
           connection.query(query, function (err, rows, fields) {
             sql.connect(config, err => {
-              var j = 0;
+              var j = 0,
+                z = 0;
               for(j = 0; j < rows.length; j += 1) {
                 data[j] = {
                   name: "№ " + rows[j].bakery + " " + rows[j].name,
@@ -31,7 +32,8 @@
                   // console.log("index", index);
                   // console.log("in callback func: ", bakeryData);
                   data[index].bakeryData = bakeryData;
-                  if (index === rows.length - 1) {
+                  z += 1;
+                  if (z === rows.length) {
                     console.log(data);
                   }
                 });

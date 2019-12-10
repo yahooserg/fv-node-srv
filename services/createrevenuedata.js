@@ -29,7 +29,7 @@
                 };
                 msSQLJob (data[j].id, function (bakeryData, index) {
                   console.log(data[index]);
-                  console.log("in callback func: "bakeryData);
+                  console.log("in callback func: ", bakeryData);
                 });
               }
               console.log(data);

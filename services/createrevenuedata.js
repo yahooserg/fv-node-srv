@@ -23,7 +23,7 @@
               // var j = 0,
               //   z = 0;
               // for(j = 0; j < rows.length; j += 1) {
-              var msSQLJob = function (j, rows) {
+              var msSQLJob = function (j) {
                 // console.log("in JOB: ", bakery);
                 // Query
                 data[j] = {
@@ -91,7 +91,7 @@
                 })
 
               }
-              msSQLJob (data, 0, rows);
+              msSQLJob (0);
               // }
               // console.log(data);
             })

@@ -28,11 +28,11 @@
                   bakeryData: {}
                 };
                 msSQLJob (data[j].id, function (bakeryData, index) {
-                  console.log(data[index]);
+                  console.log("index", index);
                   console.log("in callback func: ", bakeryData);
                 });
               }
-              console.log(data);
+              // console.log(data);
             })
           });
           connection.end();
@@ -95,7 +95,7 @@
           bakeryData.monthBeforeLastMonth.average = Math.ceil(bakeryData.monthBeforeLastMonth.revenue/bakeryData.monthBeforeLastMonth.checks);
 
           callback(bakeryData, bakery);
-          console.log("In func: ",bakeryData);
+          // console.log("In func: ",bakeryData);
 
       })
 

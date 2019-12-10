@@ -1,6 +1,8 @@
 /*jslint nomen: true, node: true, unparam: true*/
 (function () {
     "use strict";
+    var fs = require('fs');
+
     // var express = require('express'),
     //     app = express(),
     //     http,
@@ -24,7 +26,10 @@
     var createRevenueData = require('./services/createrevenuedata.js'),
       revenueStore = function () {
         createRevenueData.getDataFromDB(function (data) {
-          console.log(data);
+          fs.writeFile("./../bakerydata.json", JSON.stringify(data), function () {
+            console.log(JSON.stringify(data));
+          })
+          // console.log(data);
         });
       };
     revenueStore();

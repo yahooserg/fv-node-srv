@@ -15,7 +15,7 @@
         // weatherKey = require(__dirname + '/../weatherkey'),
         // forecast = require('./forecast'),
         myFunctions = require('./services/myfunctions'),
-        createRevenueData = require('./services/createrevenuedata.js'),
+        // createRevenueData = require('./services/createrevenuedata.js'),
         getTimeString = myFunctions.getTimeString,
         getDateString = myFunctions.getDateString,
         https = require('https'),

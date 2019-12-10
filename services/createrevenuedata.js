@@ -14,7 +14,7 @@
     module.exports = {
         getDataFromDB: function (callback) {
 
-          var query = "select id, bakery, name from stores where bakery < 1000 order by bakery limit 3;",
+          var query = "select id, bakery, name from stores where bakery < 1000 order by bakery;",
           connection = mysql.createConnection(mysqlConnection),
           data = [];
           connection.connect();
@@ -34,11 +34,11 @@
                   data[index].bakeryData = bakeryData;
                   z += 1;
                   if (z === rows.length) {
-                    console.log(data);
+                    callback(data);
                   }
                 });
               }
-              console.log(data);
+              // console.log(data);
             })
           });
           connection.end();

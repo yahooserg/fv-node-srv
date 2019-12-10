@@ -27,19 +27,23 @@
                   id: rows[j].id,
                   bakeryData: {}
                 };
-                msSQLJob (data[j].id, function (bakeryData, index) {
-                  console.log("index", index);
-                  console.log("in callback func: ", bakeryData);
+                msSQLJob (data[j].id, j, function (bakeryData, index) {
+                  // console.log("index", index);
+                  // console.log("in callback func: ", bakeryData);
+                  data[index].bakeryData = bakeryData;
+                  if (index === rows.length - 1) {
+                    console.log(data);
+                  }
                 });
               }
-              // console.log(data);
+              console.log(data);
             })
           });
           connection.end();
         }
     };
 
-    var msSQLJob = function (bakery, callback) {
+    var msSQLJob = function (bakery, index, callback) {
       console.log("in JOB: ", bakery);
       // return 0;
       // Query
@@ -94,7 +98,7 @@
           bakeryData.lastMonth.average = Math.ceil(bakeryData.lastMonth.revenue/bakeryData.lastMonth.checks);
           bakeryData.monthBeforeLastMonth.average = Math.ceil(bakeryData.monthBeforeLastMonth.revenue/bakeryData.monthBeforeLastMonth.checks);
 
-          callback(bakeryData, bakery);
+          callback(bakeryData, index);
           // console.log("In func: ",bakeryData);
 
       })

@@ -25,7 +25,6 @@
               // for(j = 0; j < rows.length; j += 1) {
               var msSQLJob = function (j) {
                 // console.log("in JOB: ", bakery);
-                // return 0;
                 // Query
                 data[j] = {
                   name: "№ " + rows[j].bakery + " " + rows[j].name,

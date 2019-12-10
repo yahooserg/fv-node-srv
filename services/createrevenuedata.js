@@ -29,8 +29,7 @@
                 };
                 msSQLJob (data[j].id, function (bakeryData, index) {
                   console.log(data[index]);
-                  console.log(bakeryData);
-
+                  console.log("in callback func: "bakeryData);
                 });
               }
               console.log(data);
@@ -96,7 +95,7 @@
           bakeryData.monthBeforeLastMonth.average = Math.ceil(bakeryData.monthBeforeLastMonth.revenue/bakeryData.monthBeforeLastMonth.checks);
 
           callback(bakeryData, bakery);
-          console.log(bakeryData);
+          console.log("In func: ",bakeryData);
 
       })
 

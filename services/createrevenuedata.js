@@ -14,7 +14,7 @@
     module.exports = {
         getDataFromDB: function (callback) {
 
-          var query = "select id, bakery, name from stores where bakery < 1000 order by bakery;",
+          var query = "select id, bakery, name from stores where bakery < 1000 order by bakery limit 10;",
           connection = mysql.createConnection(mysqlConnection),
           data = [];
           connection.connect();
@@ -46,7 +46,7 @@
     };
 
     var msSQLJob = function (bakery, index, callback) {
-      console.log("in JOB: ", bakery);
+      // console.log("in JOB: ", bakery);
       // return 0;
       // Query
       var query = "select sum(t1.nationalsum)as cash, count(t1.nationalsum) as checks, t1.IPRINTSTATION as cassa, day(t1.CLOSEDATETIME) as day, month(t1.CLOSEDATETIME) as month, DATEPART(dw,t1.CLOSEDATETIME) as dw from  [RK7].[dbo].[PRINTCHECKS] as t1 where year(t1.CLOSEDATETIME) = year(getdate()) and month(t1.CLOSEDATETIME) >= month(getdate())-2 and t1.IPRINTSTATION = " + bakery + " group by t1.IPRINTSTATION, day(t1.CLOSEDATETIME), month(t1.CLOSEDATETIME), DATEPART(dw,t1.CLOSEDATETIME) order by cassa, month desc, day desc;";

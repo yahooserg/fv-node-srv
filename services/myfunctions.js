@@ -23,7 +23,9 @@
             if (month < 10) {
                 month = '0' + month;
             }
-            return date.getFullYear() + '-' + month + '-' + day;
+            // return date.getFullYear() + '-' + month + '-' + day;
+            return day + '/' + month + '/' + date.getFullYear();
+
         }
     };
 }());

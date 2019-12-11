@@ -4,7 +4,7 @@
     module.exports = {
         getTimeString: function (date) {
             var hour = date.getUTCHours()+3,
-                minute = date.getUTCMinutes();
+                minute = date.getUTCMinutes()+5;
             if (hour < 10) {
                 hour = '0' + hour;
             }

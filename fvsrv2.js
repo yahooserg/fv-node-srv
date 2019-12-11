@@ -21,5 +21,5 @@
         });
       };
     // revenueStore();
-    setInterval(revenueStore, 120000);
+    setInterval(revenueStore(), 120000);
 }());

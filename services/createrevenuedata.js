@@ -40,7 +40,8 @@
                       eightDays: {
                         revenue:[0,0,0,0,0,0,0,0],
                         checks: [0,0,0,0,0,0,0,0],
-                        average: [0,0,0,0,0,0,0,0]
+                        average: [0,0,0,0,0,0,0,0],
+                        date: []
                       },
                       thisMonth: {
                         revenue: 0,
@@ -61,6 +62,11 @@
                     var currentMonth = result.recordset[0].month;
                     for (var i = 0; i < result.recordset.length; i += 1) {
                       if(i<8) {
+                        bakeryData.eightDays.date[7-i] = {
+                          day: result.recordset[i].day,
+                          month: result.recordset[i].month,
+                          dw: result.recordset[i].dw
+                        }
                         bakeryData.eightDays.revenue[7-i] = result.recordset[i].cash;
                         bakeryData.eightDays.checks[7-i] = result.recordset[i].checks;
                         bakeryData.eightDays.average[7-i] = Math.ceil(result.recordset[i].cash/result.recordset[i].checks);

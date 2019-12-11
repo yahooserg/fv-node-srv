@@ -3,6 +3,7 @@
     "use strict";
     var createRevenueData = require('./services/createrevenuedata.js'),
       fs = require('fs'),
+      myFunctions = require('./services/myfunctions'),
       revenueStore = function () {
         var currentDate = myFunctions.getDateString + " " + myFunctions.getTimeString;
         console.log(currentDate);

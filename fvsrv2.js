@@ -5,7 +5,7 @@
       fs = require('fs'),
       myFunctions = require('./services/myfunctions'),
       revenueStore = function () {
-        var currentDate = myFunctions.getDateString + " " + myFunctions.getTimeString;
+        var currentDate = myFunctions.getDateString() + " " + myFunctions.getTimeString();
         console.log(currentDate);
         createRevenueData.getDataFromDB(function (data) {
           fs.writeFile("./../bakerydata.json", JSON.stringify(data), function () {

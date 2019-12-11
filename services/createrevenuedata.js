@@ -13,11 +13,9 @@
 
     module.exports = {
         getDataFromDB: function (callback) {
+          
 
-          var currentDate = myFunctions.getDateString + " " + myFunctions.getTimeString;
-          console.log(currentDate);
-
-          var query = "select id, bakery, name from stores where bakery < 1000 order by bakery limit 2;",
+          var query = "select id, bakery, name from stores where bakery < 1000 order by bakery;",
           connection = mysql.createConnection(mysqlConnection),
           data = [];
           connection.connect();

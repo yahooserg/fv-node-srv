@@ -7,17 +7,15 @@
       revenueStore = function () {
         var date = new Date();
         var currentDate = myFunctions.getDateString(date) + " " + myFunctions.getTimeString(date);
-        console.log(currentDate);
-        console.log(date);
+        // console.log(currentDate);
+        console.log("Start: ", date);
         createRevenueData.getDataFromDB(function (data) {
           fs.writeFile("./../bakerydata.json", JSON.stringify(data), function () {
-            console.log("DONE");
+            // console.log("DONE");
             date = new Date();
-
             currentDate = myFunctions.getDateString(date) + " " + myFunctions.getTimeString(date);
-            console.log(date);
-
-            console.log(currentDate);
+            console.log("Finish: ", date);
+            // console.log(currentDate);
           })
         });
       };

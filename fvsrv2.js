@@ -14,6 +14,7 @@
           firstRun = false;
         }
         if(hour <= 23 && hour >= 8 && minute % 30 === 20 || firstRun) {
+          firstRun = false;
           var currentDate = myFunctions.getDateString(date) + " " + myFunctions.getTimeString(date);
           // console.log(currentDate);
           console.log("Start: ", date);

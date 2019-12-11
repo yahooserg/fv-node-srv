@@ -4,12 +4,16 @@
     var createRevenueData = require('./services/createrevenuedata.js'),
       fs = require('fs'),
       myFunctions = require('./services/myfunctions'),
+      firstRun = true,
       revenueStore = function () {
         var date = new Date();
         var hour = date.getUTCHours()+3,
             minute = date.getUTCMinutes();
         // console.log(hour, minute);
-        if(hour <= 23 && hour >= 8 && minute % 30 === 20) {
+        if(minute % 30 % 20 - 15 >= 0) {
+          firstRun = false;
+        }
+        if(hour <= 23 && hour >= 8 && minute % 30 === 20 || firstRun) {
           var currentDate = myFunctions.getDateString(date) + " " + myFunctions.getTimeString(date);
           // console.log(currentDate);
           console.log("Start: ", date);

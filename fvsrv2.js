@@ -9,7 +9,7 @@
         var hour = date.getUTCHours()+3,
             minute = date.getUTCMinutes();
         console.log(hour, minute);
-        if(hour <= 23 && hour >= 8 && minute % 30 === 15) {
+        if(hour <= 23 && hour >= 8 && minute % 30 === 20) {
           var currentDate = myFunctions.getDateString(date) + " " + myFunctions.getTimeString(date);
           // console.log(currentDate);
           console.log("Start: ", date);

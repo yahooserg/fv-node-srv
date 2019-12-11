@@ -10,7 +10,7 @@
         var hour = date.getUTCHours()+3,
             minute = date.getUTCMinutes();
         // console.log(hour, minute);
-        if(minute % 30 % 20 - 15 >= 0) {
+        if(minute % 30 % 20 - 15 >= 0) { //if left 5 minutes before scheduled update do it now
           firstRun = false;
         }
         if(hour <= 23 && hour >= 8 && minute % 30 === 20 || firstRun) {

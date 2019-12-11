@@ -11,7 +11,7 @@
 
         console.log("Start: ", date);
         createRevenueData.getDataFromDB(function (data) {
-          data[date.length] = currentDate;
+          data[data.length] = currentDate;
           fs.writeFile("./../bakerydata.json", JSON.stringify(data), function () {
             date = new Date();
             currentDate = myFunctions.getDateString(date) + " " + myFunctions.getTimeString(date);

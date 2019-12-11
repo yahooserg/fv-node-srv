@@ -5,12 +5,15 @@
       fs = require('fs'),
       myFunctions = require('./services/myfunctions'),
       revenueStore = function () {
-        var currentDate = myFunctions.getDateString(Date.now()) + " " + myFunctions.getTimeString(Date.now());
+        var date = new Date();
+        var currentDate = myFunctions.getDateString(date) + " " + myFunctions.getTimeString(date);
         console.log(currentDate);
         createRevenueData.getDataFromDB(function (data) {
           fs.writeFile("./../bakerydata.json", JSON.stringify(data), function () {
             console.log("DONE");
-            currentDate = myFunctions.getDateString(Date.now()) + " " + myFunctions.getTimeString(Date.now());
+            date = new Date();
+
+            currentDate = myFunctions.getDateString(date) + " " + myFunctions.getTimeString(date);
             console.log(currentDate);
           })
         });

@@ -36,7 +36,7 @@
                 const request = new sql.Request();
                 request.query(query, (err, result) => {
                     // ... error checks
-                    // console.log("Error: ", err);
+                    console.log("Error: ", err);
                     var bakeryData = {
                       eightDays: {
                         revenue:[0,0,0,0,0,0,0,0],

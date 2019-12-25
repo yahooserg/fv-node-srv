@@ -78,7 +78,8 @@
                           k = 0;
                           l += 1;
                           if (l < data.length && i) {
-                            data[j] = bakeryData;
+                            data[j].bakeryData = bakeryData;
+
                           }
                           j = z;
                           bakeryData = {
@@ -104,9 +105,7 @@
                               average: 0
                             }
                           };
-                          if (l === data.length) {
-                            data[j] = bakeryData;
-                          }
+
                         }
                       }
                     }
@@ -137,6 +136,9 @@
                     bakeryData.lastMonth.average = Math.ceil(bakeryData.lastMonth.revenue/bakeryData.lastMonth.checks);
                     bakeryData.monthBeforeLastMonth.average = Math.ceil(bakeryData.monthBeforeLastMonth.revenue/bakeryData.monthBeforeLastMonth.checks);
 
+                  }
+                  if (l === data.length) {
+                    data[j].bakeryData = bakeryData;
                   }
                   callback(data);
               })

@@ -64,7 +64,7 @@
                   if(err) {
                     console.log("Error: ", err);
                   }
-                  date2 = new Date();
+                  var date2 = new Date();
                   console.log("Data reseived from server: ", date2);
 
                   var currentBakeryId = 0,

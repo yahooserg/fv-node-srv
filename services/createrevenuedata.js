@@ -64,7 +64,6 @@
                   if(err) {
                     console.log("Error: ", err);
                   }
-
                   var currentBakeryId = 0,
                   j = 0,
                   k = 0,
@@ -133,8 +132,6 @@
                   }
                   callback(data);
               })
-
-
             })
 
             // sql.connect(config, err => {

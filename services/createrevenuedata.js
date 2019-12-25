@@ -67,40 +67,49 @@
                   var currentBakeryId = 0,
                   j = 0,
                   k = 0,
+                  l = 0,
                   currentMonth = result.recordset[0].month;
                   for (var i = 0; i < result.recordset.length; i += 1) {
                     if (currentBakeryId !== result.recordset[i].cassa) {
                       for(var z = 0; z < data.length; z += 1) {
                         if(data[z].id === result.recordset[i].cassa) {
                           currentBakeryId = result.recordset[i].cassa;
-                          j = z;
                           k = 0;
+                          l += 1;
+                          if (l < data.length && i) {
+                            data[j] = bakeryData;
+                          }
+                          j = z;
+                          bakeryData = {
+                            eightDays: {
+                              revenue:[0,0,0,0,0,0,0,0],
+                              checks: [0,0,0,0,0,0,0,0],
+                              average: [0,0,0,0,0,0,0,0],
+                              date: []
+                            },
+                            thisMonth: {
+                              revenue: 0,
+                              checks: 0,
+                              average: 0
+                            },
+                            lastMonth: {
+                              revenue: 0,
+                              checks: 0,
+                              average: 0
+                            },
+                            monthBeforeLastMonth: {
+                              revenue: 0,
+                              checks: 0,
+                              average: 0
+                            }
+                          };
+                          if (l === data.length) {
+                            data[j] = bakeryData;
+                          }
                         }
                       }
                     }
-                    var bakeryData = {
-                      eightDays: {
-                        revenue:[0,0,0,0,0,0,0,0],
-                        checks: [0,0,0,0,0,0,0,0],
-                        average: [0,0,0,0,0,0,0,0],
-                        date: []
-                      },
-                      thisMonth: {
-                        revenue: 0,
-                        checks: 0,
-                        average: 0
-                      },
-                      lastMonth: {
-                        revenue: 0,
-                        checks: 0,
-                        average: 0
-                      },
-                      monthBeforeLastMonth: {
-                        revenue: 0,
-                        checks: 0,
-                        average: 0
-                      }
-                    };
+                    var
                     if(k<8) {
                       bakeryData.eightDays.date[7-i] = {
                         day: result.recordset[i].day,
@@ -128,7 +137,6 @@
                     bakeryData.lastMonth.average = Math.ceil(bakeryData.lastMonth.revenue/bakeryData.lastMonth.checks);
                     bakeryData.monthBeforeLastMonth.average = Math.ceil(bakeryData.monthBeforeLastMonth.revenue/bakeryData.monthBeforeLastMonth.checks);
 
-                    data[j].bakeryData = bakeryData;
                   }
                   callback(data);
               })

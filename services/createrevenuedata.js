@@ -54,7 +54,7 @@
                     checks: 0,
                     average: 0
                   }
-                };
+                }
               };
             }
             sqlQueryStore += ")";

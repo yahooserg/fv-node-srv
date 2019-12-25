@@ -76,7 +76,7 @@
                   k = 0,
                   currentMonth = result.recordset[0].month;
                   for (var i = 0; i < result.recordset.length; i += 1) {
-                    if (currentBakeryId !=== result.recordset[i].cassa) {
+                    if (currentBakeryId !== result.recordset[i].cassa) {
                       for(var z = 0; z < data.length; z += 1) {
                         if(data[z].id === result.recordset[i].cassa) {
                           currentBakeryId = result.recordset[i].cassa;

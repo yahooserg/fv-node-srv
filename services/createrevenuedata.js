@@ -109,7 +109,6 @@
                         }
                       }
                     }
-                    var
                     if(k<8) {
                       bakeryData.eightDays.date[7-i] = {
                         day: result.recordset[i].day,

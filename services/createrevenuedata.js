@@ -64,9 +64,9 @@
                   if(err) {
                     console.log("Error: ", err);
                   }
-                  date = new Date();
-                  currentDate = myFunctions.getDateString(date) + " " + myFunctions.getTimeString(date);
-                  console.log("Data reseived from server: ", date);
+                  date2 = new Date();
+                  console.log("Data reseived from server: ", date2);
+
                   var currentBakeryId = 0,
                   j = 0,
                   k = 0,

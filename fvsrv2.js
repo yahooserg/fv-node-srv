@@ -30,6 +30,6 @@
         }
 
       };
-    // revenueStore();
-    setInterval(revenueStore, 60000);
+    revenueStore();
+    // setInterval(revenueStore, 60000);
 }());

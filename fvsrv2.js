@@ -9,7 +9,8 @@
         var hour = date.getUTCHours()+3,
             minute = date.getUTCMinutes();
         // console.log(hour, minute);
-        if(hour <= 23 && hour >= 8 && minute % 5 === 3) {
+
+        // if(hour <= 23 && hour >= 8 && minute % 5 === 3) {
 
           var currentDate = myFunctions.getDateString(date) + " " + myFunctions.getTimeString(date);
           // console.log(currentDate);
@@ -28,7 +29,7 @@
               // console.log(currentDate);
             })
           });
-        }
+        // }
 
       };
     revenueStore();

@@ -21,6 +21,8 @@
           data = [];
           connection.connect();
           connection.query(query, function (err, rows, fields) {
+
+            //test
             for(j = 0; j < rows.length; j += 1) {
               if (j === 0) {
                 sqlQueryStore = " (t1.IPRINTSTATION = " + rows[j].id;
@@ -30,6 +32,7 @@
             }
             sqlQueryStore += ")";
             console.log(sqlQueryStore);
+            //test end
 
             // sql.connect(config, err => {
             //   // var j = 0,

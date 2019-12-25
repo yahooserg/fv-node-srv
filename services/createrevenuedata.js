@@ -110,14 +110,14 @@
                       }
                     }
                     if(k<8) {
-                      bakeryData.eightDays.date[7-i] = {
+                      bakeryData.eightDays.date[7-k] = {
                         day: result.recordset[i].day,
                         month: result.recordset[i].month,
                         dw: result.recordset[i].dw
                       }
-                      bakeryData.eightDays.revenue[7-i] = result.recordset[i].cash;
-                      bakeryData.eightDays.checks[7-i] = result.recordset[i].checks;
-                      bakeryData.eightDays.average[7-i] = Math.ceil(result.recordset[i].cash/result.recordset[i].checks);
+                      bakeryData.eightDays.revenue[7-k] = result.recordset[i].cash;
+                      bakeryData.eightDays.checks[7-k] = result.recordset[i].checks;
+                      bakeryData.eightDays.average[7-k] = Math.ceil(result.recordset[i].cash/result.recordset[i].checks);
                     }
                     k += 1;
                     if(currentMonth === result.recordset[i].month) {

@@ -136,7 +136,7 @@
                     bakeryData.lastMonth.average = Math.ceil(bakeryData.lastMonth.revenue/bakeryData.lastMonth.checks);
                     bakeryData.monthBeforeLastMonth.average = Math.ceil(bakeryData.monthBeforeLastMonth.revenue/bakeryData.monthBeforeLastMonth.checks);
                     if (i === result.recordset.length - 1) {
-                      data[j].bakeryData = bakeryData;
+                      data[j].bakeryData = bakeryData; 
                     }
                   }
                   callback(data);

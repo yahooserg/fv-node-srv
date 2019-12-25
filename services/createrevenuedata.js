@@ -57,7 +57,7 @@
                 }
               };
             }
-            sqlQueryStore += ")";
+            sqlQueryStore += ") ";
             // console.log(sqlQueryStore);
             var query = "select sum(t1.nationalsum)as cash, count(t1.nationalsum) as checks, t1.IPRINTSTATION as cassa, day(t1.CLOSEDATETIME) as day, month(t1.CLOSEDATETIME) as month, DATEPART(dw,t1.CLOSEDATETIME) as dw from  [RK7].[dbo].[PRINTCHECKS] as t1 where year(t1.CLOSEDATETIME) = year(getdate()) and month(t1.CLOSEDATETIME) >= month(getdate())-2 and " + sqlQueryStore + " group by t1.IPRINTSTATION, day(t1.CLOSEDATETIME), month(t1.CLOSEDATETIME), DATEPART(dw,t1.CLOSEDATETIME) order by cassa, month desc, day desc;";
             console.log(query);
@@ -66,64 +66,80 @@
               const request = new sql.Request();
               request.query(query, (err, result) => {
                   // ... error checks
-                  console.log("Error: ", err);
+                  if(err) {
+                    console.log("Error: ", err);
+                  }
                   console.log("Result: ", result);
                   console.log("Resulter");
-
-
-                  var bakeryData = {
-                    eightDays: {
-                      revenue:[0,0,0,0,0,0,0,0],
-                      checks: [0,0,0,0,0,0,0,0],
-                      average: [0,0,0,0,0,0,0,0],
-                      date: []
-                    },
-                    thisMonth: {
-                      revenue: 0,
-                      checks: 0,
-                      average: 0
-                    },
-                    lastMonth: {
-                      revenue: 0,
-                      checks: 0,
-                      average: 0
-                    },
-                    monthBeforeLastMonth: {
-                      revenue: 0,
-                      checks: 0,
-                      average: 0
+                  var currentBakeryId = 0,
+                  j = 0,
+                  k = 0,
+                  currentMonth = result.recordset[0].month;
+                  for (var i = 0; i < result.recordset.length; i += 1) {
+                    if (currentBakeryId !=== result.recordset[i].cassa) {
+                      for(var z = 0; z < data.length; z += 1) {
+                        if(data[z].id === result.recordset[i].cassa) {
+                          currentBakeryId = result.recordset[i].cassa;
+                          j = z;
+                          k = 0;
+                        }
+                      }
                     }
-                  };
-                  // var currentMonth = result.recordset[0].month;
-                  // for (var i = 0; i < result.recordset.length; i += 1) {
-                  //   if(i<8) {
-                  //     bakeryData.eightDays.date[7-i] = {
-                  //       day: result.recordset[i].day,
-                  //       month: result.recordset[i].month,
-                  //       dw: result.recordset[i].dw
-                  //     }
-                  //     bakeryData.eightDays.revenue[7-i] = result.recordset[i].cash;
-                  //     bakeryData.eightDays.checks[7-i] = result.recordset[i].checks;
-                  //     bakeryData.eightDays.average[7-i] = Math.ceil(result.recordset[i].cash/result.recordset[i].checks);
-                  //   }
-                  //   if(currentMonth === result.recordset[i].month) {
-                  //     bakeryData.thisMonth.revenue += result.recordset[i].cash;
-                  //     bakeryData.thisMonth.checks += result.recordset[i].checks;
-                  //
-                  //   } else if (currentMonth === result.recordset[i].month + 1) {
-                  //     bakeryData.lastMonth.revenue += result.recordset[i].cash;
-                  //     bakeryData.lastMonth.checks += result.recordset[i].checks;
-                  //   } else {
-                  //     bakeryData.monthBeforeLastMonth.revenue += result.recordset[i].cash;
-                  //     bakeryData.monthBeforeLastMonth.checks += result.recordset[i].checks;
-                  //   }
-                  //
-                  // }
-                  // bakeryData.thisMonth.average = Math.ceil(bakeryData.thisMonth.revenue/bakeryData.thisMonth.checks);
-                  // bakeryData.lastMonth.average = Math.ceil(bakeryData.lastMonth.revenue/bakeryData.lastMonth.checks);
-                  // bakeryData.monthBeforeLastMonth.average = Math.ceil(bakeryData.monthBeforeLastMonth.revenue/bakeryData.monthBeforeLastMonth.checks);
-                  //
-                  // data[j].bakeryData = bakeryData;
+                    var bakeryData = {
+                      eightDays: {
+                        revenue:[0,0,0,0,0,0,0,0],
+                        checks: [0,0,0,0,0,0,0,0],
+                        average: [0,0,0,0,0,0,0,0],
+                        date: []
+                      },
+                      thisMonth: {
+                        revenue: 0,
+                        checks: 0,
+                        average: 0
+                      },
+                      lastMonth: {
+                        revenue: 0,
+                        checks: 0,
+                        average: 0
+                      },
+                      monthBeforeLastMonth: {
+                        revenue: 0,
+                        checks: 0,
+                        average: 0
+                      }
+                    };
+                    if(k<8) {
+                      bakeryData.eightDays.date[7-i] = {
+                        day: result.recordset[i].day,
+                        month: result.recordset[i].month,
+                        dw: result.recordset[i].dw
+                      }
+                      bakeryData.eightDays.revenue[7-i] = result.recordset[i].cash;
+                      bakeryData.eightDays.checks[7-i] = result.recordset[i].checks;
+                      bakeryData.eightDays.average[7-i] = Math.ceil(result.recordset[i].cash/result.recordset[i].checks);
+                    }
+                    k += 1;
+                    if(currentMonth === result.recordset[i].month) {
+                      bakeryData.thisMonth.revenue += result.recordset[i].cash;
+                      bakeryData.thisMonth.checks += result.recordset[i].checks;
+
+                    } else if (currentMonth === result.recordset[i].month + 1) {
+                      bakeryData.lastMonth.revenue += result.recordset[i].cash;
+                      bakeryData.lastMonth.checks += result.recordset[i].checks;
+                    } else {
+                      bakeryData.monthBeforeLastMonth.revenue += result.recordset[i].cash;
+                      bakeryData.monthBeforeLastMonth.checks += result.recordset[i].checks;
+                    }
+
+                    bakeryData.thisMonth.average = Math.ceil(bakeryData.thisMonth.revenue/bakeryData.thisMonth.checks);
+                    bakeryData.lastMonth.average = Math.ceil(bakeryData.lastMonth.revenue/bakeryData.lastMonth.checks);
+                    bakeryData.monthBeforeLastMonth.average = Math.ceil(bakeryData.monthBeforeLastMonth.revenue/bakeryData.monthBeforeLastMonth.checks);
+
+                    data[j].bakeryData = bakeryData;
+                  }
+                  console.log(data);
+
+
               })
 
 

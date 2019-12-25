@@ -23,14 +23,16 @@
           connection.query(query, function (err, rows, fields) {
 
             //test
-            // for(j = 0; j < rows.length; j += 1) {
-            //   if (j === 0) {
-            //     sqlQueryStore = " (t1.IPRINTSTATION = " + rows[j].id;
-            //   } else {
-            //     sqlQueryStore += " or t1.IPRINTSTATION = " + rows[j].id;
-            //   }
-            // }
-            // sqlQueryStore += ")";
+            for(j = 0; j < rows.length; j += 1) {
+              console.log(rows[j].id);
+
+              // if (j === 0) {
+              //   sqlQueryStore = " (t1.IPRINTSTATION = " + rows[j].id;
+              // } else {
+              //   sqlQueryStore += " or t1.IPRINTSTATION = " + rows[j].id;
+              // }
+            }
+            sqlQueryStore += ")";
             console.log(sqlQueryStore);
             //test end
 

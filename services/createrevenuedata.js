@@ -15,7 +15,7 @@
         getDataFromDB: function (callback) {
 
 
-          var query = "select id, bakery, name from stores where bakery < 1000 order by bakery;",
+          var query = "select id, bakery, name from stores where bakery < 1000 order by bakery limit 2;",
           sqlQueryStore = "",
           connection = mysql.createConnection(mysqlConnection),
           data = [];
@@ -29,9 +29,102 @@
               } else {
                 sqlQueryStore += " or t1.IPRINTSTATION = " + rows[j].id;
               }
+              data[j] = {
+                name: "№ " + rows[j].bakery + " " + rows[j].name,
+                id: rows[j].id,
+                bakeryData: {
+                  eightDays: {
+                    revenue:[0,0,0,0,0,0,0,0],
+                    checks: [0,0,0,0,0,0,0,0],
+                    average: [0,0,0,0,0,0,0,0],
+                    date: []
+                  },
+                  thisMonth: {
+                    revenue: 0,
+                    checks: 0,
+                    average: 0
+                  },
+                  lastMonth: {
+                    revenue: 0,
+                    checks: 0,
+                    average: 0
+                  },
+                  monthBeforeLastMonth: {
+                    revenue: 0,
+                    checks: 0,
+                    average: 0
+                  }
+                };
+              };
             }
             sqlQueryStore += ")";
-            console.log(sqlQueryStore);
+            // console.log(sqlQueryStore);
+            var query = "select sum(t1.nationalsum)as cash, count(t1.nationalsum) as checks, t1.IPRINTSTATION as cassa, day(t1.CLOSEDATETIME) as day, month(t1.CLOSEDATETIME) as month, DATEPART(dw,t1.CLOSEDATETIME) as dw from  [RK7].[dbo].[PRINTCHECKS] as t1 where year(t1.CLOSEDATETIME) = year(getdate()) and month(t1.CLOSEDATETIME) >= month(getdate())-2 and " + sqlQueryStore + " group by t1.IPRINTSTATION, day(t1.CLOSEDATETIME), month(t1.CLOSEDATETIME), DATEPART(dw,t1.CLOSEDATETIME) order by cassa, month desc, day desc;";
+            sql.connect(config, err => {
+              const request = new sql.Request();
+              request.query(query, (err, result) => {
+                  // ... error checks
+                  console.log("Error: ", err);
+                  console.log("Result: ", result);
+
+                  var bakeryData = {
+                    eightDays: {
+                      revenue:[0,0,0,0,0,0,0,0],
+                      checks: [0,0,0,0,0,0,0,0],
+                      average: [0,0,0,0,0,0,0,0],
+                      date: []
+                    },
+                    thisMonth: {
+                      revenue: 0,
+                      checks: 0,
+                      average: 0
+                    },
+                    lastMonth: {
+                      revenue: 0,
+                      checks: 0,
+                      average: 0
+                    },
+                    monthBeforeLastMonth: {
+                      revenue: 0,
+                      checks: 0,
+                      average: 0
+                    }
+                  };
+                  // var currentMonth = result.recordset[0].month;
+                  // for (var i = 0; i < result.recordset.length; i += 1) {
+                  //   if(i<8) {
+                  //     bakeryData.eightDays.date[7-i] = {
+                  //       day: result.recordset[i].day,
+                  //       month: result.recordset[i].month,
+                  //       dw: result.recordset[i].dw
+                  //     }
+                  //     bakeryData.eightDays.revenue[7-i] = result.recordset[i].cash;
+                  //     bakeryData.eightDays.checks[7-i] = result.recordset[i].checks;
+                  //     bakeryData.eightDays.average[7-i] = Math.ceil(result.recordset[i].cash/result.recordset[i].checks);
+                  //   }
+                  //   if(currentMonth === result.recordset[i].month) {
+                  //     bakeryData.thisMonth.revenue += result.recordset[i].cash;
+                  //     bakeryData.thisMonth.checks += result.recordset[i].checks;
+                  //
+                  //   } else if (currentMonth === result.recordset[i].month + 1) {
+                  //     bakeryData.lastMonth.revenue += result.recordset[i].cash;
+                  //     bakeryData.lastMonth.checks += result.recordset[i].checks;
+                  //   } else {
+                  //     bakeryData.monthBeforeLastMonth.revenue += result.recordset[i].cash;
+                  //     bakeryData.monthBeforeLastMonth.checks += result.recordset[i].checks;
+                  //   }
+                  //
+                  // }
+                  // bakeryData.thisMonth.average = Math.ceil(bakeryData.thisMonth.revenue/bakeryData.thisMonth.checks);
+                  // bakeryData.lastMonth.average = Math.ceil(bakeryData.lastMonth.revenue/bakeryData.lastMonth.checks);
+                  // bakeryData.monthBeforeLastMonth.average = Math.ceil(bakeryData.monthBeforeLastMonth.revenue/bakeryData.monthBeforeLastMonth.checks);
+                  //
+                  // data[j].bakeryData = bakeryData;
+              })
+
+
+            })
+
             //test end
 
             // sql.connect(config, err => {

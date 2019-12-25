@@ -15,7 +15,7 @@
         getDataFromDB: function (callback) {
 
 
-          var query = "select id, bakery, name from stores order by bakery limit 80;",
+          var query = "select id, bakery, name from stores order by bakery;",
           sqlQueryStore = "",
           connection = mysql.createConnection(mysqlConnection),
           data = [];

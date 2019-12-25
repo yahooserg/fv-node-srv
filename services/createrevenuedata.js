@@ -76,10 +76,8 @@
                         if(data[z].id === result.recordset[i].cassa) {
                           currentBakeryId = result.recordset[i].cassa;
                           k = 0;
-                          l += 1;
-                          if (l < data.length && i) {
+                          if (i) {
                             data[j].bakeryData = bakeryData;
-
                           }
                           j = z;
                           bakeryData = {
@@ -135,8 +133,8 @@
                     bakeryData.thisMonth.average = Math.ceil(bakeryData.thisMonth.revenue/bakeryData.thisMonth.checks);
                     bakeryData.lastMonth.average = Math.ceil(bakeryData.lastMonth.revenue/bakeryData.lastMonth.checks);
                     bakeryData.monthBeforeLastMonth.average = Math.ceil(bakeryData.monthBeforeLastMonth.revenue/bakeryData.monthBeforeLastMonth.checks);
-                    if (i === result.recordset.length - 1) {
-                      data[j].bakeryData = bakeryData; 
+                    if (i == result.recordset.length - 1) {
+                      data[j].bakeryData = bakeryData;
                     }
                   }
                   callback(data);

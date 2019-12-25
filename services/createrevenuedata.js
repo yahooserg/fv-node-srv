@@ -21,8 +21,6 @@
           data = [];
           connection.connect();
           connection.query(query, function (err, rows, fields) {
-
-            //test
             for(var j = 0; j < rows.length; j += 1) {
               if (j === 0) {
                 sqlQueryStore = " (t1.IPRINTSTATION = " + rows[j].id;
@@ -58,10 +56,7 @@
               };
             }
             sqlQueryStore += ") ";
-            // console.log(sqlQueryStore);
             var query = "select sum(t1.nationalsum)as cash, count(t1.nationalsum) as checks, t1.IPRINTSTATION as cassa, day(t1.CLOSEDATETIME) as day, month(t1.CLOSEDATETIME) as month, DATEPART(dw,t1.CLOSEDATETIME) as dw from  [RK7].[dbo].[PRINTCHECKS] as t1 where year(t1.CLOSEDATETIME) = year(getdate()) and month(t1.CLOSEDATETIME) >= month(getdate())-2 and " + sqlQueryStore + " group by t1.IPRINTSTATION, day(t1.CLOSEDATETIME), month(t1.CLOSEDATETIME), DATEPART(dw,t1.CLOSEDATETIME) order by cassa, month desc, day desc;";
-            console.log(query);
-
             sql.connect(config, err => {
               const request = new sql.Request();
               request.query(query, (err, result) => {
@@ -69,8 +64,7 @@
                   if(err) {
                     console.log("Error: ", err);
                   }
-                  console.log("Result: ", result);
-                  console.log("Resulter");
+
                   var currentBakeryId = 0,
                   j = 0,
                   k = 0,
@@ -137,15 +131,11 @@
 
                     data[j].bakeryData = bakeryData;
                   }
-                  console.log(data);
-
-
+                  callback(data);
               })
 
 
             })
-
-            //test end
 
             // sql.connect(config, err => {
             //   // var j = 0,

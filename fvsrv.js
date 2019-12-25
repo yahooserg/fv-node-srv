@@ -625,12 +625,12 @@
     //     res.send(JSON.stringify({forecast: 1, date: 2}));
     // });
 
-    var revenueStore = function () {
-      createRevenueData.getDataFromDB(function (data) {
-        console.log(data);
-      });
-    };
-
-    setInterval(revenueStore, 3000);
+    // var revenueStore = function () {
+    //   createRevenueData.getDataFromDB(function (data) {
+    //     console.log(data);
+    //   });
+    // };
+    //
+    // setInterval(revenueStore, 3000);
 
 }());

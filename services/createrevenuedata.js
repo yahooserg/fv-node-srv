@@ -13,8 +13,6 @@
 
     module.exports = {
         getDataFromDB: function (callback) {
-
-
           var query = "select id, bakery, name from stores order by bakery;",
           sqlQueryStore = "",
           connection = mysql.createConnection(mysqlConnection),
@@ -64,9 +62,6 @@
                   if(err) {
                     console.log("Error: ", err);
                   }
-                  var date2 = new Date();
-                  console.log("Data reseived from server: ", date2);
-
                   var currentBakeryId = 0,
                   j = 0,
                   k = 0,
@@ -146,6 +141,4 @@
           connection.end();
         }
     };
-
-
 }());

@@ -11,6 +11,8 @@
         if(hour <= 23 && hour >= 8 && minute % 15 === 5) {
           console.log("Start: ", date);
           createRevenueData.getDataFromDB(function (data) {
+            date = new Date();
+            var currentDate = myFunctions.getDateString(date) + " " + myFunctions.getTimeString(date);
             data[data.length] = currentDate;
             fs.writeFile("./../bakerydata.json", JSON.stringify(data), function () {
               date = new Date();
@@ -18,6 +20,7 @@
             })
           });
         }
+
       };
     // revenueStore();
     setInterval(revenueStore, 60000);

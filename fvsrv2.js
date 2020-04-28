@@ -15,7 +15,6 @@
             var currentDate = myFunctions.getDateString(date) + " " + myFunctions.getTimeString(date);
             data[data.length] = currentDate;
             fs.writeFile(__dirname + "/../bakerydata.json", JSON.stringify(data), function (err) {
-              console.log(__dirname);
               if(err) {
                 console.log(err);
               }

@@ -14,6 +14,7 @@
             date = new Date();
             var currentDate = myFunctions.getDateString(date) + " " + myFunctions.getTimeString(date);
             data[data.length] = currentDate;
+            console.log(data);
             fs.writeFile("./../bakerydata.json", JSON.stringify(data), function () {
               date = new Date();
               console.log("Finish: ", date);

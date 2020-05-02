@@ -13,7 +13,7 @@
 
     module.exports = {
         getDataFromDB: function (callback) {
-          var query = "select id, bakery, name from stores order by bakery;",
+          var query = "select id, bakery, name from storeskv order by bakery;",
           sqlQueryStore = "",
           connection = mysql.createConnection(mysqlConnection),
           data = [];

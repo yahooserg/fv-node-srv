@@ -17,8 +17,19 @@
           sqlQueryStore = "",
           connection = mysql.createConnection(mysqlConnection),
           data = [];
-          connection.connect();
+          // connection.connect();
+          connection.connect(function(err) {
+            if (err) {
+              console.error('error connecting: ' + err.stack);
+              // return;
+            }
+
+            console.log('connected as id ' + connection.threadId);
+          });
           connection.query(query, function (err, rows, fields) {
+            if(err) {
+              console.log(err);
+            }
             for(var j = 0; j < rows.length; j += 1) {
               if (j === 0) {
                 sqlQueryStore = " (t1.IPRINTSTATION = " + rows[j].id;

@@ -633,7 +633,7 @@
     //
     // setInterval(revenueStore, 3000);
 
-    var tempFunction = function () {
+    var getBakeriesIDsFromServer = function () {
       var config = require(__dirname + '/../dbconnectmssqlnode.js');
       var query = "SELECT SIFR, CODE, NAME, NETNAME FROM CASHES order by sifr desc;";
       sql.connect(config, err => {
@@ -649,6 +649,6 @@
 
     };
 
-    tempFunction();
+    getBakeriesIDsFromServer();
 
 }());

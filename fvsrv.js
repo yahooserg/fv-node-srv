@@ -633,22 +633,24 @@
     //
     // setInterval(revenueStore, 3000);
 
-    var getBakeriesIDsFromServer = function () {
-      var config = require(__dirname + '/../dbconnectmssqlnode.js');
-      var query = "SELECT SIFR, CODE, NAME, NETNAME FROM CASHES order by sifr desc;";
-      sql.connect(config, err => {
-        const request = new sql.Request();
-        request.query(query, (err, result) => {
-            // ... error checks
-            if(err) {
-              console.log("Error: ", err);
-            }
-            console.log(result.recordset);
-        })
-      })
-
-    };
-
-    getBakeriesIDsFromServer();
+    ////////////////////////////////////
+    // THIS IS TO GET BAKERIES
+    // var getBakeriesIDsFromServer = function () {
+    //   var config = require(__dirname + '/../dbconnectmssqlnode.js');
+    //   var query = "SELECT SIFR, CODE, NAME, NETNAME FROM CASHES order by sifr desc;";
+    //   sql.connect(config, err => {
+    //     const request = new sql.Request();
+    //     request.query(query, (err, result) => {
+    //         // ... error checks
+    //         if(err) {
+    //           console.log("Error: ", err);
+    //         }
+    //         console.log(result.recordset);
+    //     })
+    //   })
+    //
+    // };
+    // getBakeriesIDsFromServer();
+    //////////////////////////////
 
 }());

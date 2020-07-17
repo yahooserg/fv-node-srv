@@ -150,6 +150,19 @@
             })
           });
           connection.end();
+        },
+        getStores: function (callback) {
+          var query = "SELECT SIFR, CODE, NAME, NETNAME FROM CASHES order by sifr desc;";
+          sql.connect(config, err => {
+            const request = new sql.Request();
+            request.query(query, (err, result) => {
+                // ... error checks
+                if(err) {
+                  console.log("Error: ", err);
+                }
+                callback(result.recordset);
+            })
+          })
         }
     };
 }());

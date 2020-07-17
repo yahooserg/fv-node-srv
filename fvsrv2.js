@@ -22,6 +22,13 @@
               console.log("Finish: ", date);
             })
           });
+          createRevenueData.getStores(function (data) {
+            fs.writeFile(__dirname + "/../sores.json", JSON.stringify(data), function (err) {
+              if(err) {
+                console.log(err);
+              }
+            })
+          });
         }
 
       };

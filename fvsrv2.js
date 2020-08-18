@@ -23,7 +23,7 @@
             })
           });
           createRevenueData.getStores(function (data) {
-            fs.writeFile(__dirname + "/../sores.json", JSON.stringify(data), function (err) {
+            fs.writeFile(__dirname + "/../stores.json", JSON.stringify(data), function (err) {
               if(err) {
                 console.log(err);
               }

@@ -76,7 +76,7 @@
                   if(err) {
                     console.log("Error in Data: ", err);
                   }
-                  console.log("Data: ", result);
+                  // console.log("Data: ", result);
 
                   var currentBakeryId = 0,
                   j = 0,
@@ -150,6 +150,7 @@
                       data[j].bakeryData = bakeryData;
                     }
                   }
+                  // console.log(data);
                   callback(data);
               })
             })

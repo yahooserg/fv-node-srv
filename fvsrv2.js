@@ -16,7 +16,7 @@
             data[data.length] = currentDate;
             fs.writeFile(__dirname + "/../bakerydata.json", JSON.stringify(data), function (err) {
               if(err) {
-                console.log(err);
+                console.log("Error writing file: ", err);
               }
               date = new Date();
               console.log("Finish: ", date);

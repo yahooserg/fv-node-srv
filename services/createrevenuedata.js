@@ -73,6 +73,8 @@
                   if(err) {
                     console.log("Error: ", err);
                   }
+                  console.log("Data: ", results);
+
                   var currentBakeryId = 0,
                   j = 0,
                   k = 0,

@@ -76,7 +76,7 @@
                   if(err) {
                     console.log("Error in Data: ", err);
                   }
-                  console.log("Data: ", results);
+                  console.log("Data: ", result);
 
                   var currentBakeryId = 0,
                   j = 0,

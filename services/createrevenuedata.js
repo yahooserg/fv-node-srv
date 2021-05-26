@@ -150,7 +150,6 @@
                       data[j].bakeryData = bakeryData;
                     }
                   }
-                  // console.log(data);
                   callback(data);
               })
             })

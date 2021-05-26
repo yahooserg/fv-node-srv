@@ -11,7 +11,6 @@
         if(hour <= 23 && hour >= 8 && minute % 15 === 5) {
           console.log("Start: ", date);
           createRevenueData.getDataFromDB(function (data) {
-            console.log(data);
             date = new Date();
             var currentDate = myFunctions.getDateString(date) + " " + myFunctions.getTimeString(date);
             data[data.length] = currentDate;

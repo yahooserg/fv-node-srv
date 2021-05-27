@@ -6,6 +6,7 @@
       myFunctions = require('./myfunctions');
     const sql = require('mssql'),
       mysql = require('mysql');
+      console.log(config);
 
     sql.on('error', err => {
       console.log("Error in SQL: ", err);
@@ -28,7 +29,7 @@
           });
           connection.query(query, function (err, rows, fields) {
             if(err) {
-              console.log(err);
+              console.log("MySQL query error: ",err);
             }
             for(var j = 0; j < rows.length; j += 1) {
               if (j === 0) {
